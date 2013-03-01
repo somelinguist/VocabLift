@@ -1,0 +1,1 @@
+pref("vocabularymanager.history", "[]");

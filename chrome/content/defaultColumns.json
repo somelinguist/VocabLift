@@ -1,0 +1,48 @@
+{
+    "columns": [
+        {
+            "className": "LexEntry",
+            "dataType": "MultiText",
+            "displayName": "Word",
+            "fieldName": "lexicalUnit",
+            "writingSystemId": "qaa"
+        },
+        {
+            "className": "LexSense",
+            "dataType": "Option",
+            "displayName": "Part Of Speech",
+            "fieldName": "grammaticalInfo",
+            "optionsRange": "grammatical-info",
+            "writingSystemId": "analysis"
+        },
+        {
+            "className": "LexSense",
+            "dataType": "MultiText",
+            "displayName": "Gloss",
+            "fieldName": "gloss",
+            "writingSystemId": "analysis"
+        },
+        {
+            "className": "LexSense",
+            "dataType": "MultiText",
+            "displayName": "Definition",
+            "fieldName": "definition",
+            "writingSystemId": "analysis"
+        },
+        {
+            "className": "LexSense",
+            "dataType": "OptionCollection",
+            "displayName": "Semantic Domain",
+            "fieldName": "semanticDomain",
+            "optionsListFile": "Ddp4.xml",
+            "writingSystemId": "analysis"
+        },
+        {
+            "className": "LexPronunciation",
+            "dataType": "Audio",
+            "displayName": "Audio",
+            "fieldName": "media",
+            "writingSystemId": "qaa-Zxxx-x-audio"
+        }
+    ]
+}

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" ng-app="VocabManager">
+<head>
+    <meta charset="utf-8">
+    <title>Vocabulary Manager</title>
+    <link rel="stylesheet" href="lib/ng-grid-1.9.0/ng-grid.css"/>
+    <link rel="stylesheet" href="css/app.css"/>
+
+    <script>
+
+    </script>
+</head>
+<body ng-controller="VocabManagerCtrl">
+
+<div id="MainContainer">
+    <div id="Toolbar">
+        <button ng-click="quickPractice()" ng-disabled="selectedEntries.length<1"> Quick Practice</button>
+        <button ng-click="EditConfiguration()">Options</button>
+        <button ng-click="OpenProject()">Open Project</button>
+        <button ng-click="SaveProject()" ng-disabled="!project.dirty">Save Project</button>
+    </div>
+    <div class="gridStyle" ng-grid="gridOptions"></div>
+    <div id="decks">
+        <button ng-click="addDeck()" ng-disabled="false">Add Deck</button>
+        <button ng-click="addEntries()" ng-disabled="!activeDeck.active || selectedEntries < 1">Add Entries</button>
+        <button ng-click="Practice()" ng-disabled="selectedDecks.length < 1">Practice</button>
+        <button ng-click="exportDecks()" ng-disabled="selectedDecks.length < 1">Export Decks</button>
+        <div ng-repeat="deck in decks" ng-include src="'partials/deck.html'">{{deck.name}}</div>
+    </div>
+    <div id="ModalBackground" class="hide" ng-class="{hide:!modal.showModal}">
+    </div>
+    <div id="ConfigWindow" class="hide" ng-class="{hide:!modal.showConfigWindow}" ng-include
+         src="'partials/configure.html'"></div>
+    <div id="PracticeWindow" class="hide" ng-class="{hide:!modal.showPractice}" ng-include
+         src="'partials/PracticeWindow.html'"></div>
+
+</div>
+
+<!-- In production use:
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
+-->
+<script src="lib/IO.js"></script>
+<script src="lib/jquery/jquery.js"></script>
+<script src="lib/angular/angular.js"></script>
+<script src="lib/ng-grid-1.9.0/ng-grid-1.9.0.debug.js"></script>
+<script src="lib/ng-grid/plugins/ng-grid-flexible-height.js"></script>
+<script src="lib/jsonix/Jsonix-all.js"></script>
+<script src="lib/lift/Mappings13.js"></script>
+<script src="lib/lift/Mappings15.js"></script>
+<script src="lib/lift/MappingsWeSayConfig.js"></script>
+<script src="lib/jquery-xpath/jquery.xpath.js"></script>
+<script src="js/app.js"></script>
+<script src="js/services.js"></script>
+<script src="js/controllers.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/directives.js"></script>
+</body>
+</html>

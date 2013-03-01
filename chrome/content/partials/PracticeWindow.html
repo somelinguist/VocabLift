@@ -1,0 +1,150 @@
+<div id="PracticeWrapper">
+    <div class="closeWindow">
+        <button ng-click="modal.showPractice=false; modal.showModal=false">x</button>
+    </div>
+    <div id="ModeSelector">
+        <span ng-click="practiceMode='Association'" ng-class="{active:practiceMode=='Association'}">Association</span>
+        <span ng-click="practiceMode='Comprehension'"
+              ng-class="{active:practiceMode=='Comprehension'}">Comprehension</span>
+        <span ng-click="practiceMode='Spelling'" ng-class="{active:practiceMode=='Spelling'}">Spelling</span>
+        <!--<span ng-click="practiceMode='Pronunciation'" ng-class="{active:practiceMode=='Pronunciation'}">Pronunciation</span>-->
+    </div>
+    <div id="ModeContent">
+        <div id="PracticeArea">
+            <div ng-switch on="practiceMode">
+                <div ng-switch-when="Association" ng-controller="AssociationPractice">
+                    <div ng-hide="started">
+                        <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
+                        <button ng-click="setupAssociation()">Begin</button>
+                    </div>
+                    <div ng-show="started">
+                        <audio id="associationAudio" hidden="true" ng-src="{{currentSet.properties.audio}}"></audio>
+                        <div id="AssociationWord">
+                            <span>{{currentSet.properties.side1}}</span>
+                            <button ng-click="playAudioWord('associationAudio')">▶</button>
+                        </div>
+                        <div id="AssociationPicture">
+                            <img ng-src="{{currentSet.properties.picture}}" ng-show="currentSet.properties.picture"/>
+
+                            <div class="label" ng-show="showGloss">{{currentSet.properties.side2}}</div>
+                        </div>
+                        <div id="AssociationFooter">
+                            <div id="AssociationNav">
+                                <button ng-click="prevSet()">Previous</button>
+                                <button ng-click="nextSet()">Next</button>
+                            </div>
+                            <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-switch-when="Comprehension" ng-controller="ComprehensionPractice">
+                    <div ng-hide="started">
+                        <span>Number of cards per set: </span><input type=text
+                                                                     ng-model="project.config.comprehensionOptions.setSize"/>
+
+                        <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
+                        <div>
+                            <button ng-click="setupComprehension(); started=true">Begin</button>
+                        </div>
+                    </div>
+                    <div ng-show="started">
+                        <audio id="wordAudio" hidden="true" ng-src="{{currentSet.set.item.properties.audio}}"></audio>
+                        <div id="ComprehensionWord">{{currentSet.set.item.properties.side1}}
+                            <button ng-click="playAudioWord('wordAudio')">▶</button>
+                        </div>
+                        <div id="PracticeCards">
+                            <div class="comprehensionCard " ng-repeat="card in currentSet.set.group"
+                                 ng-click="attempt(card.guid)">
+                                <img ng-src="{{card.properties.picture}}" ng-show="card.properties.picture"/>
+
+                                <div class="label" ng-show="showGloss">{{card.properties.side2}}</div>
+                                <div class="answer"
+                                     ng-class="{correct:isCorrect(card.guid), incorrect:!isCorrect(card.guid)}"
+                                     ng-show="currentSet.attempted"></div>
+                            </div>
+                        </div>
+                        <div id="ComprehensionFooter">
+                            <div id="ComprehensionNav">
+                                <button ng-click="prevSet()">Previous</button>
+                                <button ng-click="nextSet()">Next</button>
+                            </div>
+                            <div id="ComprehensionProgress">
+                                Completed: {{completed}} of {{practiceCards.length}} Correct: {{correct}} Incorrect:
+                                {{incorrect}}
+                            </div>
+                            <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-switch-when="Spelling" ng-controller="SpellingPractice">
+                    <div ng-hide="started">
+                        <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
+                        <button ng-click="setupSpelling()">Begin</button>
+                    </div>
+                    <div ng-show="started">
+                        <audio id="spellingAudio" hidden="true" ng-src="{{currentSet.properties.audio}}"></audio>
+                        <div id="SpellingWord">
+                            <span ng-show="showGloss">{{currentSet.properties.side2}}</span>
+                            <button ng-click="playAudioWord('spellingAudio')">▶</button>
+                        </div>
+                        <div id="SpellingResponse">
+                            <span>Answer:</span>
+                            <input ng-model="answer"/>
+                            <button ng-click="check()">Check</button>
+                        </div>
+                        <div id="SpellingAnswer" ng-show="currentSet.attempts">
+                            {{currentSet.properties.side1}}
+                        </div>
+                        <div id="SpellingPicture">
+                            <img ng-src="{{currentSet.properties.picture}}" ng-show="currentSet.properties.picture"/>
+                        </div>
+                        <div id="SpellingFooter">
+                            <div id="SpellingNav">
+                                <button ng-click="prevSet()">Previous</button>
+                                <button ng-click="nextSet()">Next</button>
+                            </div>
+                            <div id="SpellingProgress">
+                                Completed: {{completed}} of {{practiceCards.length}} Correct: {{correct}} Incorrect:
+                                {{incorrect}}
+                            </div>
+                            <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
+                        </div>
+                    </div>
+                </div>
+                <!--<div ng-switch-when="Pronunciation" ng-controller="PronunciationPractice">
+                    <div ng-hide="started">
+                        <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
+                        <button ng-click="setupPronunciation()">Begin</button>
+                    </div>
+                    <div ng-show="started">
+                        <audio id="pronWordAudio" hidden="true" ng-src="{{currentSet.properties.audio}}"></audio>
+                        <audio id="pronSayAudio" controls></audio>
+                        <div id="PronunciationWord">
+                            <span>{{currentSet.properties.side1}}</span>
+                            <button ng-click="playAudioWord('pronWordAudio')">▶</button>
+                        </div>
+                        <div id="PronunciationSay">
+                            <div>Recording:</div>
+                            <span ng-switch on="audioStatus">
+                                <button ng-switch-when="stopped" id="recordPronunciationButton" ng-click="recordAudio()">⚫</button>
+                                <button ng-switch-when="recording" ng-click="stopRecordAudio()">■</button>
+                            </span>
+                            <button ng-disabled="audioStatus=='recording'" ng-click="playAudioWord('pronSayAudio')">▶</button>
+                        </div>
+                        <div id="PronunciationPicture">
+                            <img ng-src="{{currentSet.properties.picture}}" ng-show="currentSet.properties.picture"/>
+                            <div class="label" ng-show="showGloss">{{currentSet.properties.side2}}</div>
+                        </div>
+                        <div id="PronunciationFooter">
+                            <div id="PronunciationNav">
+                                <button ng-disabled="audioStatus=='recording'" ng-click="prevSet()">Previous</button>
+                                <button ng-disabled="audioStatus=='recording'" ng-click="nextSet()">Next</button>
+                            </div>
+                            <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
+                        </div>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+    </div>
+</div>

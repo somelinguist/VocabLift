@@ -1,0 +1,51 @@
+<div style="height: 100%" draggable="true" ng-model="row"
+     class="dropdown">
+    <div class="dropdown-toggle" data-toggle="dropdown">
+        <div ng-repeat="col in visibleColumns()" class="ngCell col{{$index}} {{col.cellClass}}" ng-cell></div>
+    </div>
+    <div class="dropdown-detail">
+        <div class="detailEntry">
+            <table>
+                <td class="label">Word</td>
+                <td>
+                    <div class="detailData">
+                        <div class="detailWord" ng-repeat="form in row.entity.lexicalUnit.form">
+                            <span class="lang">{{form.lang}}</span>{{form.text.content[0]}}
+                            <!--<input class="detailInput" ng-model="form.text.content[0]"/>-->
+                        </div>
+                    </div>
+                </td>
+            </table>
+        </div>
+        <div class="detailSense" ng-repeat="sense in row.entity.sense">
+            <div class="senseLabel">Sense {{$index + 1}}</div>
+            <table>
+                <tr>
+                    <td class="label">Glosses</td>
+                    <td>
+                        <div class="detailData">
+                            <div class="detailGloss" ng-repeat="gloss in sense.gloss">
+                                <span class="lang">{{gloss.lang}}</span>{{gloss.text.content[0]}}
+                                <!--<input class="detailInput" ng-model="gloss.text.content[0]"/>-->
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">Semantic Domain</td>
+                    <td>
+                        <div class="detailData">
+                            <div class="detailSemDomain">
+                                {{sense.trait[0].value}}
+                                <!--<select ui-select2 ng-model="sense.trait[0].value" data-placeholder="Add domain...">
+                                    <option></option>
+                                    <option ng-repeat="domain in semanticDomains.rangeElement" value="{{domain.id}}">{{domain.id}}</option>
+                                </select>-->
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

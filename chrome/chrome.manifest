@@ -1,0 +1,5 @@
+content        VocabularyManager       content/          contentaccessible=yes
+skin           VocabularyManager       classic/1.0       skin/
+locale         VocabularyManager       en-US             locale/en-US/
+
+
