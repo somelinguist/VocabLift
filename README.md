@@ -12,7 +12,7 @@ Language-learning tool that uses vocabulary from LIFT-format dictionaries produc
 
 -Trying to load large lift files that don't already have a config file generated tends to be slow and may hang. It has to do with the way the language tags for fields are found. If a config file already exists, the file loads more quickly. Generation of config files for smaller lift files works better but is still slow.
 
-<h4><a href="#changelong">See Change Log</a></h4>
+<h4><a href="#changelog">See Change Log</a></h4>
 
 <h3>Installation</h3>
 After downloading, unzip the archive to its own folder (for example, C:\Program Files(x86)\VocabularyManager\ on Windows).
