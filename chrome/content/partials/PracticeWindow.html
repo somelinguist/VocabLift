@@ -1,23 +1,23 @@
 <div id="PracticeWrapper">
     <div class="closeWindow">
-        <button ng-click="modal.showPractice=false; modal.showModal=false">x</button>
+        <button ng-click="modal.showPractice=false; modal.showModal=false; practice.started=false;">x</button>
     </div>
     <div id="ModeSelector">
-        <span ng-click="practiceMode='Association'" ng-class="{active:practiceMode=='Association'}">Association</span>
-        <span ng-click="practiceMode='Comprehension'"
-              ng-class="{active:practiceMode=='Comprehension'}">Comprehension</span>
-        <span ng-click="practiceMode='Spelling'" ng-class="{active:practiceMode=='Spelling'}">Spelling</span>
+        <span ng-click="practice.mode='Association'" ng-class="{active:practice.mode=='Association'}">Association</span>
+        <span ng-click="practice.mode='Comprehension'"
+              ng-class="{active:practice.mode=='Comprehension'}">Comprehension</span>
+        <span ng-click="practice.mode='Spelling'" ng-class="{active:practice.mode=='Spelling'}">Spelling</span>
         <!--<span ng-click="practiceMode='Pronunciation'" ng-class="{active:practiceMode=='Pronunciation'}">Pronunciation</span>-->
     </div>
     <div id="ModeContent">
         <div id="PracticeArea">
-            <div ng-switch on="practiceMode">
+            <div ng-switch on="practice.mode">
                 <div ng-switch-when="Association" ng-controller="AssociationPractice">
-                    <div ng-hide="started">
+                    <div ng-hide="practice.started">
                         <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
                         <button ng-click="setupAssociation()">Begin</button>
                     </div>
-                    <div ng-show="started">
+                    <div ng-show="practice.started">
                         <audio id="associationAudio" hidden="true" ng-src="{{currentSet.properties.audio}}"></audio>
                         <div id="AssociationWord">
                             <span>{{currentSet.properties.side1}}</span>
@@ -38,16 +38,24 @@
                     </div>
                 </div>
                 <div ng-switch-when="Comprehension" ng-controller="ComprehensionPractice">
-                    <div ng-hide="started">
+                    <div ng-hide="practice.started">
                         <span>Number of cards per set: </span><input type=text
                                                                      ng-model="project.config.comprehensionOptions.setSize"/>
 
                         <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
                         <div>
-                            <button ng-click="setupComprehension(); started=true">Begin</button>
+                            <button ng-click="setupComprehension()"
+                                    ng-disabled="practiceCards.length < project.config.comprehensionOptions.setSize">
+                                Begin
+                            </button>
+                            <div class="practiceSetupWarning"
+                                 ng-show="practiceCards.length < project.config.comprehensionOptions.setSize">*Please
+                                set "Numbers of cards per set" to less than or equal to the number of cards in the
+                                currently selected deck(s): {{practiceCards.length}}
+                            </div>
                         </div>
                     </div>
-                    <div ng-show="started">
+                    <div ng-show="practice.started">
                         <audio id="wordAudio" hidden="true" ng-src="{{currentSet.set.item.properties.audio}}"></audio>
                         <div id="ComprehensionWord">{{currentSet.set.item.properties.side1}}
                             <button ng-click="playAudioWord('wordAudio')">▶</button>
@@ -77,11 +85,11 @@
                     </div>
                 </div>
                 <div ng-switch-when="Spelling" ng-controller="SpellingPractice">
-                    <div ng-hide="started">
+                    <div ng-hide="practice.started">
                         <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
                         <button ng-click="setupSpelling()">Begin</button>
                     </div>
-                    <div ng-show="started">
+                    <div ng-show="practice.started">
                         <audio id="spellingAudio" hidden="true" ng-src="{{currentSet.properties.audio}}"></audio>
                         <div id="SpellingWord">
                             <span ng-show="showGloss">{{currentSet.properties.side2}}</span>
@@ -89,8 +97,14 @@
                         </div>
                         <div id="SpellingResponse">
                             <span>Answer:</span>
-                            <input ng-model="answer"/>
-                            <button ng-click="check()">Check</button>
+
+                            <form ng-submit="check()">
+                                <input ng-model="answer" lang="{{spellingLang}}"/>
+                                <input type="submit" value="Check"/>
+                                <span class="answer"
+                                      ng-class="{correct:currentSet.response == 'correct', incorrect:currentSet.response == 'incorrect'}"
+                                      ng-show="currentSet.response"></span>
+                            </form>
                         </div>
                         <div id="SpellingAnswer" ng-show="currentSet.attempts">
                             {{currentSet.properties.side1}}
@@ -112,11 +126,11 @@
                     </div>
                 </div>
                 <!--<div ng-switch-when="Pronunciation" ng-controller="PronunciationPractice">
-                    <div ng-hide="started">
+                    <div ng-hide="practice.started">
                         <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
                         <button ng-click="setupPronunciation()">Begin</button>
                     </div>
-                    <div ng-show="started">
+                    <div ng-show="practice.started">
                         <audio id="pronWordAudio" hidden="true" ng-src="{{currentSet.properties.audio}}"></audio>
                         <audio id="pronSayAudio" controls></audio>
                         <div id="PronunciationWord">

@@ -509,6 +509,24 @@ td.label {
     text-align: center;
 }
 
+#SpellingResponse .answer {
+    display: inline-block;
+    margin-left: 5px;
+    margin-top: -10px;
+    width: 36px;
+    height: 36px;
+    background-repeat: no-repeat;
+    background-size: 36px 36px;
+}
+
+#SpellingResponse .answer.correct {
+    background-image: url("../icons/onebit/onebit-34.png");
+}
+
+#SpellingResponse .answer.incorrect {
+    background-image: url("../icons/onebit/onebit-33.png");
+}
+
 #SpellingPicture {
     margin: 10px auto;
     text-align: center;
