@@ -56,7 +56,7 @@ One card will be display at a time. The sound file will be played as prompt for 
 
 <h3 id="changelog">Change Log</h3>
 
-<h4 id="v0.1.7">Version 0.1.6</h4>
+<h4 id="v0.1.7">Version 0.1.7</h4>
 <h5>Bug fixes</h5>
 - In version 0.1.6, the buttons to move writing system languages up or down in preference stopped working. The functionality has been restored.
 
