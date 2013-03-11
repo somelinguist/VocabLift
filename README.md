@@ -4,7 +4,7 @@ VocabularyManager
 Language-learning tool that uses vocabulary from LIFT-format dictionaries produced by programs such as Fieldworks Language Explorer and WeSay.
 
 <h3>Download</h3>
-<strong><a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.6/VocabularyManager_0.1.6.zip/download">Version 0.1.6</a>:</strong> Available on SourceForge at <a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.6/VocabularyManager_0.1.6.zip/download">http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.6/VocabularyManager_0.1.6.zip/download</a>
+<strong><a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.7/VocabularyManager_0.1.7.zip/download">Version 0.1.7</a>:</strong> Available on SourceForge at <a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.7/VocabularyManager_0.1.7.zip/download">http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.7/VocabularyManager_0.1.7.zip/download</a>
 
 <h3>Notes</h3>
 
@@ -55,6 +55,10 @@ One card will be display at a time. The sound file will be played as prompt for 
 - It's possible that more than one vernacular or analysis languages were defined in Fieldworks Language Explorer or WeSay. Vocabulary manager adds new flashcards according the language at the top of those list in the options window.
 
 <h3 id="changelog">Change Log</h3>
+
+<h4 id="v0.1.7">Version 0.1.6</h4>
+<h5>Bug fixes</h5>
+- In version 0.1.6, the buttons to move writing system languages up or down in preference stopped working. The functionality has been restored.
 
 <h4 id="v0.1.6">Version 0.1.6</h4>
 <h5>New Features</h5>
