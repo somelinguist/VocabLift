@@ -28,6 +28,9 @@ LDML.Collations = new Jsonix.Model.ClassInfo({
 LDML.Collation = new Jsonix.Model.ClassInfo({
     name: 'LDML.Collation'
 });
+LDML.Rules = new Jsonix.Model.ClassInfo({
+    name: 'LDML.Rules'
+});
 LDML.Base = new Jsonix.Model.ClassInfo({
     name: 'LDML.Base'
 });
@@ -157,6 +160,10 @@ LDML.FWDefaultFontFeatures = new Jsonix.Model.ClassInfo({
             elementName: new Jsonix.XML.QName('base'),
             typeInfo: LDML.Base
         }), new Jsonix.Model.ElementPropertyInfo({
+            name: 'rules',
+            elementName: new Jsonix.XML.QName('rules'),
+            typeInfo: LDML.Rules
+        }), new Jsonix.Model.ElementPropertyInfo({
             name: 'special',
             elementName: new Jsonix.XML.QName('special'),
             typeInfo: LDML.Special
@@ -168,6 +175,20 @@ LDML.FWDefaultFontFeatures = new Jsonix.Model.ClassInfo({
             collection: true,
             elementName: new Jsonix.XML.QName('alias'),
             typeInfo: LDML.Alias
+        })];
+    }
+    {
+        LDML.Rules.properties = [new Jsonix.Model.AnyElementPropertyInfo({
+            // Name of the property
+            name: "any",
+            // Whether the property is collection or not, defaults to false
+            collection: false,
+            // Whether the property allows DOM nodes, default to true
+            allowDom: true,
+            // Whether the property allows typed objects, default to true
+            allowTypedObject: true,
+            // If the property is a mixed property, default to true
+            mixed: true
         })];
     }
     {
@@ -353,6 +374,10 @@ LDML.Mappings.elementInfos = [
     {
         elementName: new Jsonix.XML.QName('collation'),
         typeInfo: LDML.Collation
+    },
+    {
+        elementName: new Jsonix.XML.QName('rules'),
+        typeInfo: LDML.Rules
     },
     {
         elementName: new Jsonix.XML.QName('base'),

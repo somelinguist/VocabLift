@@ -187,8 +187,17 @@ td.label {
     display: inline-block;
 }
 
+.cardHeadword {
+    display: inline-block;
+    width: 30%;
+}
+
 .cardSense {
     margin-left: 10px;
+}
+
+.cardSense select {
+    width: 40%;
 }
 
 .cardEditButton {
@@ -200,7 +209,7 @@ td.label {
 }
 
 .dropdown-detail.cardEdit {
-    min-width: 67%;
+    min-width: 80%;
     padding: 5px 7px;
 }
 
@@ -234,16 +243,17 @@ td.label {
 }
 
 #ConfigContainer {
-    position: relative;
-    margin: 0.5% auto;
-    width: 99%;
-    height: 99%;
+    position: absolute;
+    top: 0.5%;
+    bottom: 0.5%;
+    left: 0.5%;
+    right: 0.5%;
 }
 
 #LanguageConfig {
     position: relative;
-    height: 40%;
-    width: 30%;
+    height: 35%;
+    width: 100%;
 }
 
 #VernacularLangConfig {
@@ -264,8 +274,8 @@ td.label {
 
 #columnsConfig {
     position: relative;
-    height: 30%;
-    width: 40%;
+    height: 35%;
+    width: 100%;
 }
 
 #AvailableColumns {
@@ -289,7 +299,7 @@ td.label {
     height: 10%;
 }
 
-#ConfigWindow .listbox {
+#ConfigContainer .listbox {
     position: absolute;
     top: 20px;
     left: 0px;
@@ -297,12 +307,12 @@ td.label {
     height: 80%;
 }
 
-#ConfigWindow .listbox select {
+#ConfigContainer .listbox select {
     height: 100%;
     width: 100%;
 }
 
-#ConfigWindow .buttons {
+#ConfigContainer .buttons {
     position: absolute;
     top: 20px;
     right: 0px;
@@ -310,7 +320,7 @@ td.label {
     height: 80%;
 }
 
-#ConfigWindow .buttons button {
+#ConfigContainer .buttons button {
     display: block;
 }
 

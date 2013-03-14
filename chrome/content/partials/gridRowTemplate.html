@@ -1,7 +1,7 @@
 <div style="height: 100%" draggable="true" ng-model="row"
      class="dropdown">
     <div class="dropdown-toggle" data-toggle="dropdown">
-        <div ng-repeat="col in visibleColumns()" class="ngCell col{{$index}} {{col.cellClass}}" ng-cell></div>
+        <div ng-repeat="col in renderedColumns" class="ngCell col{{$index}} {{col.cellClass}}" ng-cell></div>
     </div>
     <div class="dropdown-detail">
         <div class="detailEntry">

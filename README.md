@@ -4,7 +4,7 @@ VocabularyManager
 Language-learning tool that uses vocabulary from LIFT-format dictionaries produced by programs such as Fieldworks Language Explorer and WeSay.
 
 <h3>Download</h3>
-<strong><a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.7/VocabularyManager_0.1.7.zip/download">Version 0.1.7</a>:</strong> Available on SourceForge at <a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.7/VocabularyManager_0.1.7.zip/download">http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.7/VocabularyManager_0.1.7.zip/download</a>
+<strong><a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.8/VocabularyManager_0.1.8.zip/download">Version 0.1.8</a>:</strong> Available on SourceForge at <a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.8/VocabularyManager_0.1.8.zip/download">http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.8/VocabularyManager_0.1.8.zip/download</a>
 
 <h3>Notes</h3>
 
@@ -56,6 +56,21 @@ One card will be display at a time. The sound file will be played as prompt for 
 
 <h3 id="changelog">Change Log</h3>
 
+<h4 id="v0.1.8">Version 0.1.8</h4>
+<h5>Bug fixes</h5>
+- Filters for the entry table and the input for the Spelling practice now match on both precomposed and decomposed Unicode characters.
+- Fixed a bug that where having a malformed pronunciation element in an entry in the lift file would prevent cards from being created from that entry and prevent Quick Practice from loading such entries.
+- Fixed a bug preventing the importing of writing system definition files with rules.
+
+<h5>Outstanding bugs</h5>
+- Long load times for large lift files that do not have project configuration files.
+- Variant entries from Fieldworks or WeSay are not supported yet.
+- Column sorting information is saved in the project configuration file but not triggering default sorting when the project is opened.
+
+<h5>Other changes</h5>
+- Cosmetic changes to the options window and deck panel.
+- Upgraded ng-grid component to version 2.0.2
+
 <h4 id="v0.1.7">Version 0.1.7</h4>
 <h5>Bug fixes</h5>
 - In version 0.1.6, the buttons to move writing system languages up or down in preference stopped working. The functionality has been restored.
@@ -71,7 +86,7 @@ One card will be display at a time. The sound file will be played as prompt for 
 <h5>Outstanding bugs</h5>
 - Long load times for large lift files that do not have project configuration files.
 - The Spelling mode does not match combined and composite unicode characters.
-- Variant entries from Fieldworkds or WeSay are not supported yet.
+- Variant entries from Fieldworks or WeSay are not supported yet.
 
 <h5>Other changes</h5>
 - The Options dialog is now a real window that can be moved and re-sized.

@@ -194,7 +194,12 @@ if (navigator.userAgent.toLowerCase().indexOf('vocabularymanager') != -1) {
                         if (entry.leafName.substring(entry.leafName.length - 4) === "ldml") {
                             var data = FileIO.read(entry, "utf-8");
                             if (data) {
-                                var iWs = writingSystemContext.createUnmarshaller().unmarshalString(data).value;
+                                try {
+                                    var iWs = writingSystemContext.createUnmarshaller().unmarshalString(data).value;
+                                }
+                                catch (e) {
+                                    alert(e);
+                                }
                                 var keyboard = null;
                                 var language = iWs.identity.language.type;
                                 if (iWs.identity.variant) {
@@ -336,7 +341,7 @@ VocabManagerServices.factory('ProjectServices', function ($http, $filter, LiftSe
             }
             else {
                 if (entry) {
-                    if (entry.pronunciation) {
+                    if (entry.pronunciation && entry.pronunciation.length && entry.pronunciation[0].media && entry.pronunciation[0].media.length) {
                         return this.liftObject.directory + this.config.audioInfo.path + entry.pronunciation[0].media[0].href;
                     }
                 }
