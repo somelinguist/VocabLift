@@ -13,7 +13,7 @@ Dependencies: jQuery & angular.js. (JqueryUi draggable for non-HTML5 compliant b
 ##About##
 __ng-grid__ Originally built on knockout we wanted to port it to angular.
 
-version 1.9.0
+version 2.0.2
 
 [nuGet](https://nuget.org/packages/ng-grid)
 
@@ -23,9 +23,8 @@ Questions, Comments, Complaints? feel free to email us at nggridteam@gmail.com
 ***
 ##Roadmap##
 
-We are going to be adding more features here as we head to a 2.0 release, including:
+We are going to be adding more features here as we head to a 3.0 release, including:
 
-* Virtualized column scrolling
 * Anything else the rest of the community wants to contribute that isn't a terrible idea. :)
 
 ***
@@ -46,7 +45,7 @@ _The bare bones_:
 // Define your own controller somewhere..
 function MyCtrl($scope) {
 	$scope.myData = [{name: "Moroni", age: 50},
-                     {name: "Tiancum", age: 43},
+                     {name: "Teancum", age: 43},
                      {name: "Jacob", age: 27},
                      {name: "Nephi", age: 29},
                      {name: "Enos", age: 34}];
@@ -64,6 +63,9 @@ Check out the [Getting Started](https://github.com/angular-ui/ng-grid/wiki/Getti
 [Examples](http://angular-ui.github.com/ng-grid/)
 
 ##Change Log##
+* __2013-03-08__ - Version 2.0.2 - minor bugfixes, updating some plugins.
+* __2013-03-05__ - Version 2.0.1 - Moved to grunt build system. No more international version; all languages are included by default. Fixed minor grouping display issue. Using $templateCache for templates instead of global namespace.
+* __2013-03-05__ - Version 2.0.0 - Breaking Changes: see documentation (showSelectionBox, enableRowSelection, showFooter). Column Virtualization added. Row virtualization performance improved. Excel-like editing instead of enableFocusedCellEdit.
 * __2013-02-18__ - Version 1.9.0 - Aggregates now display correctly. Added more option methods to select and group data (see wiki), Added column pinning.
 * __2013-02-11__ - Version 1.8.0.hotfix - Fixes for multi-level grouping and adding the gridId to both the grid options and as argument to the "ngGridEventData" so you can identify what grid it came from.
 * __2013-02-07__ - Version 1.8.0 - Major architectural changes which greatly improves performance. virtualizationThreshold now controlls when virtualization is force-enabled and is user-specified in options.
