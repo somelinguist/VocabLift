@@ -7,7 +7,7 @@ Language-learning tool that uses vocabulary from LIFT-format dictionaries produc
 <strong><a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.9/VocabularyManager_0.1.9.zip/download">Version 0.1.9</a>:</strong> Available on SourceForge at <a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.9/VocabularyManager_0.1.9.zip/download">http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.9/VocabularyManager_0.1.9.zip/download</a>
 
 <h4>New features in version 0.1.9</h4>
-- Added the ability to <a href="editing-cards">create arbitrary cards</a> based on an entry.
+- Added the ability to <a href="#editing-cards">create arbitrary cards</a> based on an entry.
 <h5><a href="#change-log">See the change log</a></h5>
 
 <h3>Notes</h3>
