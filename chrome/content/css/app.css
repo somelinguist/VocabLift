@@ -213,6 +213,19 @@ td.label {
     padding: 5px 7px;
 }
 
+.cardEdit span.label {
+    display: inline-block;
+    width: 15%;
+}
+
+.cardEdit select {
+    width: 50%;
+}
+
+.cardEdit input {
+    width: 49%;
+}
+
 .closeWindow {
     position: absolute;
     top: 0px;

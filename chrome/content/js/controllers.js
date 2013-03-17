@@ -6,6 +6,7 @@ var prefs;
 //var windowcloser = new WindowCloses();
 
 function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, WritingSystemServices, DeckServices) {
+    $scope.projectInitialized = false;
     $scope.OpenProject = function (newWindow = true) {
         var nsIFilePicker = Components.interfaces.nsIFilePicker;
         var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
@@ -309,7 +310,7 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
                         var fName = field.substr(14);
                         result = $filter('filter')(result, function (item) {
                             if (item.__columnMap__[fName]) {
-                                if (UNorm.nfkd(item.__columnMap__[fName]).indexOf(UNorm.nfkd(filterText[field])) > -1) {
+                                if (UNorm.nfkd(item.__columnMap__[fName]).toLowerCase().indexOf(UNorm.nfkd(filterText[field].toLowerCase())) > -1) {
                                     return true;
                                 }
                             }
@@ -343,7 +344,9 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
     };
 
     $scope.$on("ngGridEventColumns", function (event, args) {
-        $scope.saveGridColumns(args);
+        if ($scope.projectInitialized) {
+            $scope.saveGridColumns(args);
+        }
     });
     $scope.$on('ngGridEventSorted', function (event, sortInfo) {
         for (var i = 0; i < $scope.listColumns.length; i++) {
@@ -352,10 +355,16 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
         for (var i = 0; i < sortInfo.columns.length; i++) {
             $scope.listColumns[sortInfo.columns[i].index - 1].sort = sortInfo.directions[i];
         }
-        $scope.project.dirty = true;
-        if ($scope.project.config.autoSave) {
-            $scope.SaveProject();
+        if ($scope.projectInitialized) {
+            $scope.project.dirty = true;
+            if ($scope.project.config.autoSave) {
+                $scope.SaveProject();
+            }
         }
+    });
+
+    $scope.$on("$viewContentLoaded", function (event, args) {
+        $scope.projectInitialized = true;
     });
 
     $scope.selectedEntries = new Array();
@@ -392,7 +401,7 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
         }
     };
 
-    $scope.possibleCards = function (entry) {
+    $scope.possibleCards = function (entry, card = null) {
         var cards = new Array();
         var sense;
         var word = $scope.getHeadword(entry);
@@ -447,6 +456,21 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
         }
         catch (e) {
             console.log(e);
+        }
+        if (card && card.properties) {
+
+            var check = $filter('filter')(cards, function (item) {
+                for (var prop in card.properties) {
+                    //alert(card[prop] + ":" + item[prop])
+                    if (card.properties[prop] != item[prop]) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+            if (check.length < 1) {
+                cards.unshift(card.properties);
+            }
         }
         return cards;
     };
@@ -817,10 +841,15 @@ function GridFilterCtrl($scope, $filter) {
 GridFilterCtrl.$inject = ['$scope', '$filter'];
 
 function CardListView($scope, $filter) {
-    $scope.possibilities = $scope.possibleCards($scope.getEntry($scope.card.entry));
+    $scope.possibilities = $scope.possibleCards($scope.getEntry($scope.card.entry), $scope.card);
     //ugly hack
     $scope.card.properties = $filter('filter')($scope.possibilities, {sense: $scope.card.properties.sense, side1: $scope.card.properties.side1})[0];
 
+    $scope.cardChanged = false;
+    $scope.side1Edit = $scope.card.properties.side1;
+    $scope.side2Edit = $scope.card.properties.side2;
+    $scope.pictureEdit = $scope.card.properties.picture;
+    $scope.audioEdit = $scope.card.properties.audio;
     $scope.pictureList = new Array();
     $scope.audioList = new Array();
     var entry = $scope.getEntry($scope.card.entry);
@@ -835,15 +864,109 @@ function CardListView($scope, $filter) {
                 $scope.pictureList.push(pic);
             }
         }
-        //alert($scope.getAudioSourcesForSelection(entry));
+        if ($scope.card.properties.picture) {
+            var check = $filter('filter')($scope.pictureList, {path: $scope.card.properties.picture});
+            if (check < 1) {
+                var shortName = $scope.card.properties.picture.substr($scope.card.properties.picture.lastIndexOf("/") + 1);
+                $scope.pictureList.push({path: $scope.card.properties.picture, display: shortName});
+            }
+        }
+
         $scope.audioList = $scope.getAudioSourcesForSelection(entry);
+        if ($scope.card.properties.audio) {
+            var check = $filter('filter')($scope.audioList, {path: $scope.card.properties.audio});
+            if (check < 1) {
+                var shortName = $scope.card.properties.audio.substr($scope.card.properties.audio.lastIndexOf("/") + 1);
+                $scope.audioList.push({path: $scope.card.properties.audio, display: shortName});
+            }
+        }
     }
-    $scope.ChangeCardProperties = function () {
+
+    $scope.changeCard = function () {
+        $scope.side1Edit = $scope.card.properties.side1;
+        $scope.side2Edit = $scope.card.properties.side2;
+        $scope.pictureEdit = $scope.card.properties.picture;
+        $scope.audioEdit = $scope.card.properties.audio;
         $scope.project.dirty = true;
         if ($scope.project.config.autoSave) {
             $scope.SaveProject();
         }
-    }
+    };
+
+    $scope.saveCard = function () {
+        try {
+            if ($scope.card.properties.side1 != $scope.side1Edit || $scope.card.properties.side2 != $scope.side2Edit) {
+                var oldCard = angular.copy($scope.card.properties);
+                $scope.possibilities.push(oldCard);
+                $scope.card.properties.side1 = $scope.side1Edit;
+                $scope.card.properties.side2 = $scope.side2Edit;
+            }
+            $scope.card.properties.picture = $scope.pictureEdit;
+            $scope.card.properties.audio = $scope.audioEdit;
+            $scope.cardChanged = false;
+            $scope.project.dirty = true;
+            if ($scope.project.config.autoSave) {
+                $scope.SaveProject();
+            }
+        }
+        catch (e) {
+            alert(e);
+        }
+    };
+
+    $scope.BrowsePicture = function () {
+        if (navigator.userAgent.toLowerCase().indexOf('vocabularymanager') != -1) {
+            var nsIFilePicker = Components.interfaces.nsIFilePicker;
+            var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+            fp.init(window, "Select a File", nsIFilePicker.modeOpen);
+            fp.appendFilter("Picture files", "*.jpg;*.jpeg;*.png;*tif");
+            var res = fp.show();
+            if (res != nsIFilePicker.returnCancel) {
+                try {
+                    var file = FileIO.open(fp.file.path);
+                    var dir = FileIO.open(stripFilePath($scope.project.liftObject.directory) + $scope.project.config.picturePath.substr(0, $scope.project.config.picturePath.lastIndexOf("/")));
+                    if (dir.path != stripFilePath($scope.project.liftObject.directory) + $scope.project.config.picturePath.substr(0, $scope.project.config.picturePath.lastIndexOf("/"))) {
+                        file.copyTo(dir, "");
+                    }
+
+                    $scope.pictureList.push({path: $scope.project.liftObject.directory + $scope.project.config.picturePath + file.leafName, display: file.leafName});
+                    $scope.pictureEdit = $scope.project.liftObject.directory + $scope.project.config.picturePath + file.leafName;
+                    $scope.cardChanged = true;
+                }
+                catch (e) {
+                    alert(e);
+                    console.log(e);
+                }
+            }
+        }
+    };
+
+    $scope.BrowseAudio = function () {
+        if (navigator.userAgent.toLowerCase().indexOf('vocabularymanager') != -1) {
+            var nsIFilePicker = Components.interfaces.nsIFilePicker;
+            var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+            fp.init(window, "Select a File", nsIFilePicker.modeOpen);
+            fp.appendFilter("Sound files", "*.wav");
+            var res = fp.show();
+            if (res != nsIFilePicker.returnCancel) {
+                try {
+                    var file = FileIO.open(fp.file.path);
+                    var dir = FileIO.open(stripFilePath($scope.project.liftObject.directory) + $scope.project.config.audioInfo.path.substr(0, $scope.project.config.audioInfo.path.lastIndexOf("/")));
+                    if (dir.path != stripFilePath($scope.project.liftObject.directory) + $scope.project.config.audioInfo.path.substr(0, $scope.project.config.audioInfo.path.lastIndexOf("/"))) {
+                        file.copyTo(dir, "");
+                    }
+
+                    $scope.audioList.push({path: $scope.project.liftObject.directory + $scope.project.config.audioInfo.path + file.leafName, display: file.leafName});
+                    $scope.audioEdit = $scope.project.liftObject.directory + $scope.project.config.audioInfo.path + file.leafName;
+                    $scope.cardChanged = true;
+                }
+                catch (e) {
+                    alert(e);
+                    console.log(e);
+                }
+            }
+        }
+    };
 
 
 }
@@ -1050,7 +1173,7 @@ function SpellingPractice($scope, $filter) {
     };
 
     $scope.check = function () {
-        if (UNorm.nfkd($scope.answer) === UNorm.nfkd($scope.currentSet.properties.side1)) {
+        if (UNorm.nfkd($scope.answer).toLowerCase() === UNorm.nfkd($scope.currentSet.properties.side1).toLowerCase()) {
             $scope.currentSet.response = "correct";
             $scope.correct = $scope.correct + 1;
         }

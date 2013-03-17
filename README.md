@@ -4,7 +4,11 @@ VocabularyManager
 Language-learning tool that uses vocabulary from LIFT-format dictionaries produced by programs such as Fieldworks Language Explorer and WeSay.
 
 <h3>Download</h3>
-<strong><a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.8/VocabularyManager_0.1.8.zip/download">Version 0.1.8</a>:</strong> Available on SourceForge at <a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.8/VocabularyManager_0.1.8.zip/download">http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.8/VocabularyManager_0.1.8.zip/download</a>
+<strong><a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.9/VocabularyManager_0.1.9.zip/download">Version 0.1.9</a>:</strong> Available on SourceForge at <a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.9/VocabularyManager_0.1.9.zip/download">http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.9/VocabularyManager_0.1.9.zip/download</a>
+
+<h4>New features in version 0.1.9</h4>
+- Added the ability to <a href="editing-cards">create arbitrary cards</a> based on an entry.
+<h5><a href="#change-log">See the change log</a></h5>
 
 <h3>Notes</h3>
 
@@ -12,11 +16,9 @@ Language-learning tool that uses vocabulary from LIFT-format dictionaries produc
 
 -Trying to load large lift files that don't already have a config file generated tends to be slow and may hang. It has to do with the way the language tags for fields are found. If a config file already exists, the file loads more quickly. Generation of config files for smaller lift files works better but is still slow.
 
-<h4><a href="#change-log">See Change Log</a></h4>
-
 <h3>Installation</h3>
 After downloading, unzip the archive to its own folder (for example, C:\Program Files(x86)\VocabularyManager\ on Windows).
-Optionally, create a short cut for you start menu or desktop.
+Optionally, create a shortcut for your start menu or desktop.
 
 <h3>Running the program</h3>
 Double-click the file VocabularyManager.exe or the shortcut you created to start.
@@ -37,9 +39,12 @@ On the right, there is a list of flashcards organized into decks. The list will 
 
 After cards have been added to a deck, they can be customized depending on what data is in the entry. If the entry that the card refers to has multiple senses, glosses, definitions, or example sentences, these will be listed in the drop down menu next to the name of the card. The card can only refer to one of these, so choose which one you want it to. If you want to include multiple senses, etc from the entry, then create another card from that entry.
 
-You can also choose what sound or picture file is associated with a card by clicking the Edit button that is displayed when hovering over a card. Fieldworks and WeSay only allow you to put sound files at the entry level, so if you want different sound files for example sentence or different senses, add them in one of those programs and select the appropriate one from the drop down in Vocabulary Manager. Picture files are stored at the sense level, so it's easy to have one per sense, but if you want to have one picture for a gloss/definition and another for an example sentence, you'll have to choose it from the drop down. By default, the first audio file and picture file are chosen, if present.
+<h5>Editing cards</h5>
+You can also choose what sound or picture file is associated with a card by clicking the Edit button that is displayed when hovering over a card. Fieldworks and WeSay only allow you to put sound files at the entry level, so if you want different sound files for example sentence or different senses, add them in one of those programs and select the appropriate one from the drop down in Vocabulary Manager. Picture files are stored at the sense level, so it's easy to have one per sense, but if you want to have one picture for a gloss/definition and another for an example sentence, you'll have to choose it from the drop down. By default, the first audio file and picture file are chosen, if present. As of version 0.1.9, you can add picture and audio files to a card that are not referred to in the LIFT file. These changes will only be reflected in the card. They will not be reflected in the LIFT file.
 
-To use the flashcards, select the deck(s) you want to use by checking the box beside the deck's name, then click "Practice". There are three modes, "Association", "Comprehension", and "Spellling".
+As of version 0.1.9, you can now make arbitrary cards based on an entry in the LIFT file. You can edit both sides of the card and the picture and audio files associated with it. No changes will be made to the LIFT file.
+
+To use the flashcards, select the deck(s) you want to use by checking the box beside the deck's name, then click "Practice". There are three modes, "Association", "Comprehension", and "Spelling".
 
 <h4>Association</h4>
 The cards will be displayed one at a time so you can become familiar with them. Once you start, the card will be displayed and the sound file (if present) will be played. To play the sound again, click the play button. You can move to the next card by clicking "Next". Glosses can be displayed or hidden.
@@ -54,7 +59,19 @@ One card will be display at a time. The sound file will be played as prompt for 
 - By default, Vocabulary Manager automatically saves changes to project settings and flashcards. This can be disable in the Options window.
 - It's possible that more than one vernacular or analysis languages were defined in Fieldworks Language Explorer or WeSay. Vocabulary manager adds new flashcards according the language at the top of those list in the options window.
 
-<h3 id="changelog">Change Log</h3>
+<h3 id="changelog">Change log</h3>
+
+<h4 id="v0.1.9">Version 0.1.9</h4>
+<h5>New features</h5>
+- Added the ability to create arbitrary cards based on an entry.
+
+<h5>Bug fixes</h5>
+- Filters and spelling became case-sensitive in version 0.1.8; they are now case-insensitive again.
+
+<h5>Outstanding bugs</h5>
+- Long load times for large lift files that do not have project configuration files.
+- Variant entries from Fieldworks or WeSay are not supported yet.
+- Column sorting information is saved in the project configuration file but not triggering default sorting when the project is opened.
 
 <h4 id="v0.1.8">Version 0.1.8</h4>
 <h5>Bug fixes</h5>
@@ -76,7 +93,7 @@ One card will be display at a time. The sound file will be played as prompt for 
 - In version 0.1.6, the buttons to move writing system languages up or down in preference stopped working. The functionality has been restored.
 
 <h4 id="v0.1.6">Version 0.1.6</h4>
-<h5>New Features</h5>
+<h5>New features</h5>
 - <strong>Automatic keyboard switching on windows.</strong> Several input fields will now automatically switch the active language/keyboard as defined in the writing system definitions exported by Fieldworks and WeSay. The keyboards but be installed on the system.
 
 <h5>Bug fixes</h5>
