@@ -1,7 +1,7 @@
 VocabularyManager
 =================
 
-Language-learning tool that uses vocabulary from LIFT-format dictionaries produced by programs such as Fieldworks Language Explorer and WeSay.
+Language-learning tool that uses vocabulary from LIFT-format dictionaries produced by programs such as <a href="http://fieldworks.sil.org/">Fieldworks Language Explorer</a> and <a href="http://wesay.palaso.org/">WeSay</a>.
 
 <h3>Download</h3>
 <strong><a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.9/VocabularyManager_0.1.9.zip/download">Version 0.1.9</a>:</strong> Available on SourceForge at <a href="http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.9/VocabularyManager_0.1.9.zip/download">http://sourceforge.net/projects/vocabmanager/files/Releases/0.1.9/VocabularyManager_0.1.9.zip/download</a>
