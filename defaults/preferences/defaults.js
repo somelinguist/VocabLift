@@ -1,1 +1,1 @@
-pref("vocabularymanager.history", "[]");
+pref("vocablift.history", "[]");
