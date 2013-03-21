@@ -3,7 +3,6 @@
 /* Controllers */
 var prefs;
 
-//var windowcloser = new WindowCloses();
 
 function VocabLiftCtrl($scope, $filter, ProjectServices, LiftServices, WritingSystemServices, DeckServices) {
     $scope.projectInitialized = false;
