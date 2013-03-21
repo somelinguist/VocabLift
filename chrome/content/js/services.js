@@ -4,10 +4,10 @@
 
 // Demonstrate how to register services
 // In this case it is a simple value service.
-var VocabManagerServices = angular.module('VocabManager.services', []);
-VocabManagerServices.value('version', '0.1');
+var VocabLiftServices = angular.module('VocabLift.services', []);
+VocabLiftServices.value('version', '0.1');
 
-VocabManagerServices.factory('LiftServices', function ($http, $filter) {
+VocabLiftServices.factory('LiftServices', function ($http, $filter) {
     //vars defined here
     var liftObject = {
         filePath: null,
@@ -20,7 +20,8 @@ VocabManagerServices.factory('LiftServices', function ($http, $filter) {
         liftRanges: null,
         langs: null,
         picturePath: "",
-        weSayAudioLang: ""
+        weSayAudioLang: "",
+        userFields: []
     };
 
     // service methods here
@@ -58,9 +59,53 @@ VocabManagerServices.factory('LiftServices', function ($http, $filter) {
                     var liftRangesContext = new Jsonix.Context([LIFT15.Mappings]);
                     liftObject.liftRanges = liftRangesContext.createUnmarshaller().unmarshalString(liftRangesDoc.responseText).value;
                     liftObject.liftRangesXMLDoc = liftRangesDoc;
+
+                    /*if (liftObject.lift.value.fields) {
+                     var fields = liftObject.lift.value.fields.field;
+                     var fieldColumns = [];
+                     for (var i = 0; i < fields.length; i++) {
+                     switch (fields[i].tag) {
+                     case "import-residue":
+                     case "literal-meaning":
+                     case "cv-pattern":
+                     case "tone":
+                     case "summary-definition":
+                     case "scientific-name":
+                     case "comment":
+                     continue;
+                     default:
+                     if (fields[i].form) {
+                     var info = $filter('filter')(fields[i].form, {lang: "qaa-x-spec"})[0].text;
+                     if (info) {
+                     var parts = info.split(";");
+                     if (parts.length) {
+                     var infoParts;
+                     for (var j = 0; j < parts.length; j++) {
+                     var part = parts[j].split("=");
+                     if (part.length == 2) {
+                     infoParts[part[0]] = part[1];
+                     }
+                     }
+                     var field = {
+                     userDefined: true,
+                     className: infoParts.Class,
+                     dataType: "",
+                     displayName: fields[i].tag,
+                     fieldName: fields[i].tag,
+                     writingSystemId: ""
+                     }
+                     fieldColumns.push(field);
+                     }
+                     }
+
+
+                     }
+                     }
+                     }
+                     }*/
                 }
                 catch (e) {
-
+                    console.log(e);
                 }
 
                 liftObject.picturePath = "pictures/";
@@ -76,9 +121,42 @@ VocabManagerServices.factory('LiftServices', function ($http, $filter) {
 
                     var lexEntry = $filter('filter')(liftObject.weSayConfig.components.viewTemplate.fields.field, {fieldName: "EntryLexicalForm"})[0];
                     liftObject.weSayAudioLang = $filter('filter')(lexEntry.writingSystems.id, "Zxxx-x-audio")[0];
+
+                    /*var fields = liftObject.weSayConfig.fields.field;
+                     var fieldColumns = [];
+                     for (var i = 0; i < fields.length; i++) {
+                     switch (fields[i].fieldName) {
+                     case "EntryLexicalForm":
+                     case "citation":
+                     case "literal-meaning":
+                     case "definition":
+                     case "gloss":
+                     case "note":
+                     case "Picture":
+                     case "POS":
+                     case "SILCAWL":
+                     case "ExampleSentence":
+                     case "ExampleTranslation":
+                     case "semantic-domain-ddp4":
+                     case "BaseForm":
+                     case "confer":
+                     continue;
+                     default:
+                     var field = {
+                     userDefined: true,
+                     className: fields[i].className,
+                     dataType: fields[i].dataType,
+                     displayName: fields[i].displayName,
+                     fieldName: fields[i].fieldName,
+                     writingSystemId: fields[i].writingSystems.id[0]
+                     }
+                     fieldColumns.push(field);
+                     }
+                     }
+                     liftObject.userFields = fieldColumns;*/
                 }
                 catch (e) {
-
+                    console.log(e);
                 }
             }
 
@@ -90,7 +168,7 @@ VocabManagerServices.factory('LiftServices', function ($http, $filter) {
     };
 });
 
-VocabManagerServices.factory('DeckServices', function ($http, $filter) {
+VocabLiftServices.factory('DeckServices', function ($http, $filter) {
     return {
         openDecks: function (path) {
             var decks = [];
@@ -121,8 +199,8 @@ VocabManagerServices.factory('DeckServices', function ($http, $filter) {
     };
 });
 
-if (navigator.userAgent.toLowerCase().indexOf('vocabularymanager') != -1) {
-    VocabManagerServices.factory('WritingSystemServices', function ($http, $filter) {
+if (navigator.userAgent.toLowerCase().indexOf('vocablift') != -1) {
+    VocabLiftServices.factory('WritingSystemServices', function ($http, $filter) {
 
         Components.utils.import("resource://gre/modules/ctypes.jsm");
 
@@ -242,7 +320,7 @@ if (navigator.userAgent.toLowerCase().indexOf('vocabularymanager') != -1) {
     });
 }
 
-VocabManagerServices.factory('ProjectServices', function ($http, $filter, LiftServices, WritingSystemServices, DeckServices) {
+VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServices, WritingSystemServices, DeckServices) {
     var EntryListRow = function (columns, data) {
         var self = this;
         self.guid = data.guid;
@@ -394,7 +472,7 @@ VocabManagerServices.factory('ProjectServices', function ($http, $filter, LiftSe
                 }
             }
             // since 0.1.4
-            if (navigator.userAgent.toLowerCase().indexOf('vocabularymanager') != -1) {
+            if (navigator.userAgent.toLowerCase().indexOf('vocablift') != -1) {
                 if (!project.config.appVersion || Components.classes["@mozilla.org/xpcom/version-comparator;1"].getService(Components.interfaces.nsIVersionComparator).compare(project.config.appVersion, appInfo.version)) {
                     project.config.appVersion = appInfo.version;
                     project.dirty = true;

@@ -1,4 +1,4 @@
-pref("toolkit.defaultChromeURI", "chrome://VocabularyManager/content/main.html");
+pref("toolkit.defaultChromeURI", "chrome://VocabLift/content/index.html");
 pref("toolkit.defaultChromeFeatures", "chrome,resizable=yes,dialog=no,width=1000px,height=700px");
 
 pref("network.http.accept.default", "text/html,text/json,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")

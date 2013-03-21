@@ -5,7 +5,7 @@ var prefs;
 
 //var windowcloser = new WindowCloses();
 
-function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, WritingSystemServices, DeckServices) {
+function VocabLiftCtrl($scope, $filter, ProjectServices, LiftServices, WritingSystemServices, DeckServices) {
     $scope.projectInitialized = false;
     $scope.OpenProject = function (newWindow = true) {
         var nsIFilePicker = Components.interfaces.nsIFilePicker;
@@ -22,7 +22,7 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
                     var currDir = Components.classes["@mozilla.org/file/directory_service;1"]
                         .getService(Components.interfaces.nsIDirectoryServiceProvider)
                         .getFile("CurWorkD", {})
-                    file.initWithPath(currDir.path + "\\VocabularyManager.exe");
+                    file.initWithPath(currDir.path + "\\VocabLift.exe");
                 }
                 // create an nsIProcess
                 var process = Components.classes["@mozilla.org/process/util;1"]
@@ -63,7 +63,7 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
     };
 
     $scope.SaveProject = function () {
-        if (navigator.userAgent.toLowerCase().indexOf('vocabularymanager') != -1 && $scope.project.dirty) {
+        if (navigator.userAgent.toLowerCase().indexOf('vocablift') != -1 && $scope.project.dirty) {
             $scope.project.config.practiceMode = $scope.practice.mode;
             ProjectServices.saveProject(null);
             $scope.project.dirty = false;
@@ -72,9 +72,9 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
 
     $scope.appInfo = appInfo;
 
-    if (navigator.userAgent.toLowerCase().indexOf('vocabularymanager') != -1) {
+    if (navigator.userAgent.toLowerCase().indexOf('vocablift') != -1) {
 
-        prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("vocabularymanager.");
+        prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("vocablift.");
 
         prefs.QueryInterface(Components.interfaces.nsIPrefBranch2);
 
@@ -188,7 +188,11 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
 
 
     $scope.getEntry = function (guid) {
-        return $filter('filter')($scope.Entries, {guid: guid})[0];
+        return $filter('filter')($scope.lift.entry, {guid: guid})[0];
+    };
+    $scope.getEntryFromRef = function (ref) {
+        //alert(angular.toJson(ref));
+        return $filter('filter')($scope.lift.entry, {id: ref})[0];
     };
     $scope.getSense = function (entry, senseId) {
         return $filter('filter')(entry.sense, {id: senseId})[0];
@@ -286,7 +290,7 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
             }
 
             var col = {field: fName, displayName: $scope.listColumns[i].displayName, headerCellTemplate: columnHeader, cellTemplate: template, sortable: true};
-            if ($scope.listColumns.sort) {
+            if ($scope.listColumns[i].sort) {
                 $scope.colSortInfo.fields.push(fName);
                 $scope.colSortInfo.directions.push($scope.listColumns[i].sort);
             }
@@ -341,12 +345,14 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
         if ($scope.project.config.autoSave) {
             $scope.SaveProject();
         }
+
     };
 
     $scope.$on("ngGridEventColumns", function (event, args) {
         if ($scope.projectInitialized) {
             $scope.saveGridColumns(args);
         }
+        $scope.projectInitialized = true;
     });
     $scope.$on('ngGridEventSorted', function (event, sortInfo) {
         for (var i = 0; i < $scope.listColumns.length; i++) {
@@ -363,9 +369,6 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
         }
     });
 
-    $scope.$on("$viewContentLoaded", function (event, args) {
-        $scope.projectInitialized = true;
-    });
 
     $scope.selectedEntries = new Array();
 
@@ -403,8 +406,46 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
 
     $scope.possibleCards = function (entry, card = null) {
         var cards = new Array();
-        var sense;
         var word = $scope.getHeadword(entry);
+
+        if (entry.relation && entry.relation.length) {
+            try {
+                var variant = $filter('filter')(entry.relation, function (relation) {
+                    if (relation.trait && relation.trait.length) {
+                        var trait = $filter('filter')(relation.trait, {name: "variant-type"});
+                        if (trait.length > 0) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+                if (variant.length > 0) {
+                    for (var i = 0; i < variant.length; i++) {
+                        var ventry = $scope.getEntryFromRef(variant[i].ref);
+                        if (ventry) {
+                            //alert(angular.toJson(ventry));
+                            var vcards = $scope.possibleCards(ventry, card);
+                            if (vcards.length > 0) {
+                                for (var j = 0; j < vcards.length; j++) {
+                                    vcards[j].variant = variant[i].ref;
+                                    vcards[j].side1 = word;
+                                }
+                                cards = cards.concat(vcards);
+                            }
+                        }
+                    }
+                }
+                if (cards.length) {
+
+                    return cards;
+                }
+            }
+            catch (e) {
+                alert(e);
+            }
+        }
+
+        var sense;
         var picture = "";
         var audio = $scope.project.getAudioSrc(entry);
         try {
@@ -800,7 +841,7 @@ function VocabManagerCtrl($scope, $filter, ProjectServices, LiftServices, Writin
     };
 }
 
-VocabManagerCtrl.$inject = ['$scope', '$filter', 'ProjectServices', 'LiftServices', 'WritingSystemServices', 'DeckServices'];
+VocabLiftCtrl.$inject = ['$scope', '$filter', 'ProjectServices', 'LiftServices', 'WritingSystemServices', 'DeckServices'];
 
 function GridFilterCtrl($scope, $filter) {
     alert("filter!");
@@ -852,7 +893,14 @@ function CardListView($scope, $filter) {
     $scope.audioEdit = $scope.card.properties.audio;
     $scope.pictureList = new Array();
     $scope.audioList = new Array();
-    var entry = $scope.getEntry($scope.card.entry);
+    var entry;
+    if ($scope.card.properties.variant) {
+        entry = $scope.getEntryFromRef($scope.card.properties.variant);
+    }
+    else {
+        entry = $scope.getEntry($scope.card.entry);
+    }
+
     if (entry) {
         var sense = $scope.getSense(entry, $scope.card.properties.sense);
         if (sense && sense.illustration) {
@@ -898,6 +946,7 @@ function CardListView($scope, $filter) {
             if ($scope.card.properties.side1 != $scope.side1Edit || $scope.card.properties.side2 != $scope.side2Edit) {
                 var oldCard = angular.copy($scope.card.properties);
                 $scope.possibilities.push(oldCard);
+                $scope.card.properties.type = "user-defined";
                 $scope.card.properties.side1 = $scope.side1Edit;
                 $scope.card.properties.side2 = $scope.side2Edit;
             }
@@ -915,7 +964,7 @@ function CardListView($scope, $filter) {
     };
 
     $scope.BrowsePicture = function () {
-        if (navigator.userAgent.toLowerCase().indexOf('vocabularymanager') != -1) {
+        if (navigator.userAgent.toLowerCase().indexOf('vocablift') != -1) {
             var nsIFilePicker = Components.interfaces.nsIFilePicker;
             var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
             fp.init(window, "Select a File", nsIFilePicker.modeOpen);
@@ -942,7 +991,7 @@ function CardListView($scope, $filter) {
     };
 
     $scope.BrowseAudio = function () {
-        if (navigator.userAgent.toLowerCase().indexOf('vocabularymanager') != -1) {
+        if (navigator.userAgent.toLowerCase().indexOf('vocablift') != -1) {
             var nsIFilePicker = Components.interfaces.nsIFilePicker;
             var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
             fp.init(window, "Select a File", nsIFilePicker.modeOpen);

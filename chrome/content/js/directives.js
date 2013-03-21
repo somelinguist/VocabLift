@@ -2,14 +2,14 @@
 
 /* Directives */
 
-var VocabManagerDirectives = angular.module('VocabManager.directives', []);
-VocabManagerDirectives.directive('appVersion', ['version', function (version) {
+var VocabLiftDirectives = angular.module('VocabLift.directives', []);
+VocabLiftDirectives.directive('appVersion', ['version', function (version) {
     return function (scope, elm, attrs) {
         elm.text(version);
     };
 }]);
 
-VocabManagerDirectives.directive('draggable', function () {
+VocabLiftDirectives.directive('draggable', function () {
     return {
         require: '?ngModel',
         restrict: 'A',
@@ -22,7 +22,7 @@ VocabManagerDirectives.directive('draggable', function () {
     };
 });
 
-VocabManagerDirectives.directive('droppable', function () {
+VocabLiftDirectives.directive('droppable', function () {
     return {
         require: 'ngModel',
         restrict: 'A',
@@ -41,7 +41,7 @@ VocabManagerDirectives.directive('droppable', function () {
     };
 });
 
-VocabManagerDirectives.directive('dropdownToggle', function ($document, $location, $window) {
+VocabLiftDirectives.directive('dropdownToggle', function ($document, $location, $window) {
     var openElement = null, close;
     var openDetail = null;
     return {
@@ -97,7 +97,7 @@ VocabManagerDirectives.directive('dropdownToggle', function ($document, $locatio
     };
 });
 
-VocabManagerDirectives.directive('contenteditable', function () {
+VocabLiftDirectives.directive('contenteditable', function () {
     return {
         restrict: 'A', // only activate on element attribute
         require: '?ngModel', // get a hold of NgModelController
@@ -125,8 +125,8 @@ VocabManagerDirectives.directive('contenteditable', function () {
     };
 });
 
-if (navigator.userAgent.toLowerCase().indexOf('vocabularymanager') != -1) {
-    VocabManagerDirectives.directive('lang', function () {
+if (navigator.userAgent.toLowerCase().indexOf('vocablift') != -1) {
+    VocabLiftDirectives.directive('lang', function () {
 
 
         //alert(ls.GetCurrentLanguage());
