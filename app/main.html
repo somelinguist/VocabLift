@@ -1,0 +1,216 @@
+<div id="MainContainer">
+<input style="display:none;" id="projectFileDialog" type="file" accept=".lift"/>
+<input style="display:none;" id="deckFileOpenDialog" type="file" accept=".deck"/>
+<input style="display:none;" id="deckFileSaveDialog" type="file" nwsaveas accept=".deck"/>
+<input style="display:none;" class="cardFileDialog" id="pictureFileDialog" type="file" accept=".jpg,.png"/>
+<input style="display:none;" class="cardFileDialog" id="audioFileDialog" type="file" accept=".wav"/>
+
+<div id="Toolbar">
+    <button ng-click="OpenProject()">{{'_OpenProject_' | i18n}}</button>
+    <button ng-click="SaveProject()" ng-disabled="!project.dirty">{{'_SaveProject_' | i18n}}</button>
+    <button ng-click="EditConfiguration()">{{'_Options_' | i18n}}</button>
+    <button ng-click="openSessionsManager()">{{'_StatisticsButton_' | i18n}}</button>
+</div>
+<div id="MainSubContainer" split-panel>
+
+    <div id="LiftDictionary" class="panel collapsible">
+        <div class="panelContainer">
+            <div id="DictionaryToolbar">
+                <span class="DictionaryLabel">{{'_DictionaryLabel_' | i18n}} </span>
+                <button ng-click="quickPractice()" ng-disabled="selectedEntries.length<1">{{'_QuickPractice_' |
+                    i18n}}
+                </button>
+                <button ng-click="ClearDictionaryFilter()" ng-disabled="!dictionaryFiltered">{{'_ClearFilter_' |
+                    i18n}}
+                </button>
+            </div>
+            <div class="gridStyle" ng-grid="gridOptions"></div>
+        </div>
+    </div>
+    <div id="RightPanel" class="panel">
+        <div class="panelContainer">
+            <div id="CardView">
+                <div class="cardViewEdit">
+                    <div class="cardHeader">
+                        <div class="cardHeadword" lang="{{project.config.vernacularLang[0]}}">
+                            {{currentCard.properties.side1}}
+                        </div>
+                        <div class="cardTools">
+                            <button ng-click="saveCard()" ng-disabled="!cardChanged">{{'_SaveCard_' | i18n}}
+                            </button>
+                        </div>
+                        <div class="cardPicture" ng-click="BrowsePicture();">
+                            <img ng-src="{{pictureEdit != '' && project.liftObject.directory + project.config.picturePath + pictureEdit || ''}}"
+                                 ng-show="pictureEdit"/>
+
+                            <div class="cardPictureOverlay" ng-hide="pictureEdit">
+                                <div>{{'_ChoosePicture_' | i18n}}</div>
+                            </div>
+                            <span id="PictureRemoverPicture" ng-click="removePicture($event)"></span>
+                        </div>
+                    </div>
+                    <div class="cardFields">
+                        <div class="cardField">
+                            <div class="label">{{'_Side1_' | i18n}}:</div>
+                            <div class="cardData">
+                                <input lang="{{project.config.vernacularLang[0]}}" ng-model="side1Edit"
+                                       ng-change="cardChanged = true;"/>
+                            </div>
+                        </div>
+                        <div class="cardField">
+                            <div class="label">{{'_Side2_' | i18n}}:</div>
+                            <div class="cardData">
+                                <input lang="{{project.config.analysisLang[0]}}" ng-model="side2Edit"
+                                       ng-change="cardChanged = true;"/>
+                            </div>
+                        </div>
+                        <div class="cardField">
+                            <div class="label">{{'_Picture_' | i18n}}:</div>
+                            <div class="cardData">
+                                <select ng-model="pictureEdit" ng-change="cardChanged = true;"
+                                        ng-options="pic.path as pic.display for pic in pictureList">
+                                </select>
+                                <button ng-click="BrowsePicture();">...</button>
+
+                            </div>
+                            <span id="PictureRemoverForm" ng-click="removePicture($event)"></span>
+                        </div>
+                        <div class="cardField">
+                            <div class="label">{{'_Audio_' | i18n}}:</div>
+                            <div class="cardData">
+                                <select ng-model="audioEdit" ng-change="cardChanged = true;"
+                                        ng-options="audio.path as audio.display for audio in audioList">
+                                </select>
+                                <button ng-click="BrowseAudio();">...</button>
+                            </div>
+                            <button ng-click="playAudioWord('currentCardAudio')" ng-disabled="!audioEdit">▶</button>
+                            <span id="AudioRemoverForm" ng-click="removeAudio()"></span>
+                            <audio id="currentCardAudio" hidden="true"
+                                   ng-src="{{audioEdit != '' && project.liftObject.directory + project.config.audioInfo.path + audioEdit || ''}}"></audio>
+                        </div>
+                    </div>
+                    <div class="cardFooter">
+                        <div class="relatedEntry dropdown" style="height: 100%" ng-show="currentCard.entry">
+                            <div class="relatedEntryLink dropdown-toggle" data-toggle="dropdown">
+                                <span class="relatedEntryLink" ng-show="currentCard.entry">{{'_ViewDictionaryEntry_' | i18n}}</span>
+                            </div>
+                            <div class="dropdown-detail" ng-model="entry">
+                                <div class="detailEntry">
+                                    <table>
+                                        <td class="label">{{'_Word_' | i18n}}</td>
+                                        <td>
+                                            <div class="detailData">
+                                                <div class="detailWord" ng-repeat="form in entry.lexicalUnit.form">
+                                                    <span class="lang">{{form.lang}}</span><span
+                                                        lang="{{form.lang}}">{{form.text.content[0]}}</span>
+                                                    <!--<input class="detailInput" ng-model="form.text.content[0]"/>-->
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </table>
+                                </div>
+                                <div class="detailSense" ng-repeat="sense in entry.sense">
+                                    <div class="senseLabel">{{'_Sense_' | i18n}} {{$index + 1}}</div>
+                                    <table>
+                                        <tr>
+                                            <td class="label">{{'_Glosses_' | i18n}}</td>
+                                            <td>
+                                                <div class="detailData">
+                                                    <div class="detailGloss" ng-repeat="gloss in sense.gloss">
+                                                        <span class="lang">{{gloss.lang}}</span><span
+                                                            lang="{{gloss.lang}}">{{gloss.text.content[0]}}</span>
+                                                        <!--<input class="detailInput" ng-model="gloss.text.content[0]"/>-->
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label">{{'_SemanticDomain_' | i18n}}</td>
+                                            <td>
+                                                <div class="detailData">
+                                                    <div class="detailSemDomain">
+                                                        {{sense.trait[0].value}}
+                                                        <!--<select ui-select2 ng-model="sense.trait[0].value" data-placeholder="Add domain...">
+                                                            <option></option>
+                                                            <option ng-repeat="domain in semanticDomains.rangeElement" value="{{domain.id}}">{{domain.id}}</option>
+                                                        </select>-->
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown relatedEntryOptions" ng-show="currentCard.entry">
+                            <div class="dropdown-toggle" data-toggle="dropdown">
+                                <span>{{'_PredefinedCardOptions_' | i18n}}</span>
+                            </div>
+                            <div class="dropdown-detail cardEdit">
+                                <div>{{'_PredefinedCardOptionsDescription_' | i18n}}</div>
+                                    <span class="cardSense">
+                                        <select ng-model="currentCard.properties" ng-change="changeCard()"
+                                                ng-options="obj.side2 group by obj.type | i18n for obj in possibilities">
+                                        </select>
+                                    </span>
+                            </div>
+                        </div>
+                        <div class="showCardStatistics" ng-click="showCardStatisticsWindow()" ng-show="currentCard">
+                            {{'_ViewCardStatistics_' | i18n}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="Decks">
+                <div id="DeckToolbar">
+                    <button ng-click="addDeck()" ng-disabled="false">{{'_AddDeck_' | i18n}}</button>
+                    <button ng-click="showNewCardWindow()" ng-disabled="!activeDeck.active">{{'_NewCard_' | i18n}}
+                    </button>
+                    <button ng-click="addEntries()" ng-disabled="!activeDeck.active || selectedEntries < 1">
+                        {{'_AddEntries_' | i18n}}
+                    </button>
+                    <button ng-click="Practice()">{{'_PracticeLabel_' | i18n}}</button>
+                    <button ng-click="exportDecks()" ng-disabled="selectedDecks.length < 1">{{'_ExportDecks_' |
+                        i18n}}
+                    </button>
+                    <button ng-click="importDecks()">{{'_ImportDecks_' | i18n}}</button>
+                </div>
+                <div id="DeckList">
+                    <div id="DeckListContainer" ng-repeat="deck in project.decks" ng-include
+                         src="'partials/deck.html'">{{deck.name}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="ModalBackground" class="hide" ng-class="{hide:!modal.showModal}">
+    </div>
+    <div id="PracticeWindow" class="hide" ng-class="{hide:!modal.showPractice}" ng-include
+         src="'partials/PracticeWindow.html'">
+    </div>
+<div id="CardStatisticsWindow" class="hide" ng-class="{hide:!modal.showCardStatistics}" ng-include
+     src="'partials/cardStatistics.html'">
+</div>
+<div id="NewCardWindow" class="hide" ng-class="{hide:!modal.showNewCardW}" ng-include
+     src="'partials/newCardDialog.html'">
+</div>
+<div id="SaveCardAlert" class="hide" ng-class="{hide:!modal.showSaveCardAlert}">
+    <div>{{'_SaveCardAlert_' | i18n}}</div>
+    <div>
+        <button ng-click="closeAndSaveCard()">
+            {{'_SaveButtonLabel_' | i18n}}
+        </button>
+        <button ng-click="closeSaveCardAlert()">{{'_Cancel_' | i18n}}</button>
+    </div>
+</div>
+<div id="DeleteDeckAlert" class="hide" ng-class="{hide:!modal.showDeleteDeckAlert}">
+    <div>{{'_DeleteAlert_' | i18n}}</div>
+    <div>
+        <button ng-click="removeDeck()">
+            {{'_OK_' | i18n}}
+        </button>
+        <button ng-click="removeDeckCancel()">{{'_Cancel_' | i18n}}</button>
+    </div>
+</div>
+</div>

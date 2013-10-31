@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html ng-app="VocabLiftSave">
+<head>
+</head>
+<body ng-controller="CheckSaveCtrl" style="text-align: center;">
+<div>
+    <span data-i18n="_SavePrompt_|{{project.liftObject.fileName}}"></span>
+</div>
+<div>
+    <button ng-click="closeAndSave();">
+        {{'_SaveButtonLabel_' | i18n}}
+    </button>
+    <button ng-click="closeWithoutSave();">
+        {{'_DontSaveButtonLabel_' | i18n}}
+    </button>
+    <button ng-click="closeCancel();">{{'_Cancel_' | i18n}}</button>
+</div>
+<script src="lib/angular/angular.js"></script>
+<script src="lib/localize/localize.js"></script>
+<script>
+    // Declare app level module which depends on filters, and services
+    angular.module('VocabLiftSave', ['localization']);
+
+    function CheckSaveCtrl($scope, $filter, localize) {
+        $scope.project = angular.copy(global.project);
+        localize.setLanguage($scope.project.config.interfaceLang);
+        $scope.closeCancel = function () {
+            window.close();
+        };
+
+        $scope.closeAndSave = function () {
+            global.CheckSave = 1
+            window.close();
+        };
+        $scope.closeWithoutSave = function () {
+            global.CheckSave = 2
+            window.close();
+        };
+    }
+
+    CheckSaveCtrl.$inject = ['$scope', '$filter', 'localize'];
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" ng-app="VocabLift">
+<head>
+    <meta charset="utf-8">
+    <title>VocabLift</title>
+    <link rel="stylesheet" href="lib/ng-grid-2.0.7/ng-grid.css"/>
+    <link rel="stylesheet" href="css/app.css"/>
+    <link rel="stylesheet" href="css/splitPanel.css"/>
+</head>
+<script type="text/javascript">
+    var fs = require('fs-extra');
+    var gui = require('nw.gui');
+    var spawn = require('child_process').spawn;
+    var zlib = require('zlib');
+
+</script>
+<body ng-view>
+<script type="text/javascript">
+    var win = gui.Window.get();
+    //win.showDevTools();
+
+</script>
+<!-- In production use:
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
+-->
+<script src="lib/helpers.js"></script>
+<script src="lib/jquery/jquery.js"></script>
+<script src="lib/angular/angular.js"></script>
+<script src="lib/localize/localize.js"></script>
+<script src="lib/ng-grid-2.0.7/ng-grid.debug.js"></script>
+<script src="lib/ng-grid-2.0.7/plugins/ng-grid-layout.js"></script>
+<script src="lib/jsonix/Jsonix-all.js"></script>
+<script src="lib/lift/Mappings13.js"></script>
+<script src="lib/lift/Mappings15.js"></script>
+<script src="lib/lift/MappingsWeSayConfig.js"></script>
+<script src="lib/lift/LDML.js"></script>
+<script src="lib/jquery-xpath/jquery.xpath.js"></script>
+<script src="lib/hash-key-copier/hash-key-copier.js"></script>
+<script charset="utf-8" src="lib/unorm/unorm.js"></script>
+<script charset="utf-8" src="lib/unorm/unormdata.js"></script>
+<script src="js/app.js"></script>
+<script src="js/services.js"></script>
+<script src="js/controllers.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/directives.js"></script>
+<script src="js/cardStatisticsController.js"></script>
+<script src="js/splitPanel.js"></script>
+</body>
+</html>

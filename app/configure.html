@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en" ng-app="VocabLiftConfig">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/app.css"/>
+</head>
+<body ng-controller="ConfigureCtrl">
+<div id="ConfigContainer">
+    <div id="ConfigSaveCancelToolbar">
+        <button ng-click="closeConfigAndSave();">
+            {{'_SaveButtonLabel_' | i18n}}
+        </button>
+        <button ng-click="resetConfig(); closeConfig();">{{'_Cancel_' | i18n}}</button>
+    </div>
+    <div id="ConfigSettingsContainer">
+        <div id="ProjectManagementSettings"><input type="checkbox" ng-model="config.autoSave"/>
+            {{'_SaveChangesAutoLabel_' | i18n}}
+            <input type="checkbox" ng-model="config.cardChangedWarning"/> {{'_SaveCardChangesWarningLabel_' | i18n}}
+            <div>
+                <input type="checkbox" ng-model="config.autoAddMedia"/> {{'_AutoAddMediaLabel_' | i18n}}
+            </div>
+        </div>
+        <div id="LanguageConfig">
+            <span class="title">{{'_Languages_' | i18n}}</span>
+
+            <div id="InterfaceLangConfig">
+                <span>{{'_InterfaceLanguage_' | i18n}}: </span>
+                <select ng-model="config.interfaceLang"
+                        ng-options="lang.lang as lang.name for lang in interfaceLanguages"></select>
+            </div>
+            <div id="VernacularLangConfig">
+                <div>{{'_VernacularLanguage_' | i18n}}:</div>
+                <div class="listbox">
+                    <select multiple="true" ng-model="selectedVernacular"
+                            ng-options="lang as getLanguageName(lang) for lang in config.vernacularLang">
+                    </select>
+                </div>
+                <div class="buttons">
+                    <button ng-click="MoveItemUp(config.vernacularLang, selectedVernacular)">{{'_UpLabel_' | i18n}}
+                    </button>
+                    <button ng-click="MoveItemDown(config.vernacularLang, selectedVernacular)">{{'_DownLabel_' |
+                        i18n}}
+                    </button>
+                </div>
+            </div>
+            <div id="AnalysisLangConfig">
+                <div>{{'_AnalysisLanguage_' | i18n}}:</div>
+                <div class="listbox">
+                    <select multiple="true" ng-model="selectedAnalysis"
+                            ng-options="lang as getLanguageName(lang) for lang in config.analysisLang">
+                    </select>
+                </div>
+                <div class="buttons">
+                    <button ng-click="MoveItemUp(config.analysisLang, selectedAnalysis)">{{'_UpLabel_' | i18n}}</button>
+                    <button ng-click="MoveItemDown(config.analysisLang, selectedAnalysis)">{{'_DownLabel_' | i18n}}
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="columnsConfig">
+            <div class="title">{{'_ColumnsLabel_' | i18n}}</div>
+            <div id="AvailableColumns">
+                <div>{{'_AvailableLabel_' | i18n}}:</div>
+                <div class="listbox">
+                    <select multiple="true" ng-model="selectedAvailableColumn"
+                            ng-options="col.displayName | i18n for col in project.defaultColumns">
+                    </select>
+                </div>
+                <div class="buttons">
+                    <button ng-click="addColumn()" ng-disabled="!selectedAvailableColumn"
+                            title="{{'_AddColumnsLabel_' | i18n}}">
+                        -&gt;</button>
+                </div>
+            </div>
+            <div id="CurrentColumns">
+                <div>{{'_CurrentLabel_' | i18n}}:</div>
+                <div class="listbox">
+                    <select multiple="true" ng-model="selectedCurrentColumn"
+                            ng-options="col.displayName | i18n for col in configListColumns">
+                    </select>
+                </div>
+                <div class="buttons">
+                    <button ng-click="MoveItemUp(configListColumns, selectedCurrentColumn)">{{'_UpLabel_' | i18n}}
+                    </button>
+                    <button ng-click="MoveItemDown(configListColumns, selectedCurrentColumn)">{{'_DownLabel_' | i18n}}
+                    </button>
+                    <button ng-click="removeColumn()" ng-disabled="!selectedCurrentColumn">{{'_RemoveLabel_' | i18n}}
+                    </button>
+                </div>
+            </div>
+            <!--<div>
+                Writing System:
+                <select ng-model="selectedCurrentColumn[0].writingSystemId" ng-options="lang for lang in selectedLangOptions"></select>
+            </div>-->
+        </div>
+        <div id="TaskSettings">
+            <div class="title">{{'_ComprehensionSetup_' | i18n}}</div>
+            <div>
+                <span>{{'_NumberOfCardsPerSet_' | i18n}}: </span><input type="text"
+                                                                        ng-model="config.comprehensionOptions.setSize"/>
+            </div>
+            <div>
+                <span>{{'_MaximumNumberOfAttempts_' | i18n}}: </span><input type="text"
+                                                                            ng-model="config.comprehensionOptions.maxAttempts"/>
+            </div>
+            <div class="title">{{'_SpellingSetup_' | i18n}}</div>
+            <div>
+                <span>{{'_MaximumNumberOfAttempts_' | i18n}}: </span><input type="text"
+                                                                            ng-model="config.spellingOptions.maxAttempts"/>
+            </div>
+            <div>
+                <input type="checkbox" ng-model="config.spellingOptions.checkDiacritics"/><span> {{'_CheckDiacritics_' | i18n}} </span>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="lib/helpers.js"></script>
+<script src="lib/jquery/jquery.js"></script>
+<script src="lib/angular/angular.js"></script>
+<script src="lib/localize/localize.js"></script>
+
+<script>
+    // Declare app level module which depends on filters, and services
+    angular.module('VocabLiftConfig', ['localization']);
+
+    function ConfigureCtrl($scope, $filter, localize) {
+
+        $scope.resetConfig = function () {
+            global.configChanged = false;
+            $scope.project = global.project;
+            $scope.config = angular.copy($scope.project.config);
+            $scope.configListColumns = global.listColumns;
+
+            $scope.selectedAvailableColumn = null;
+            $scope.selectedCurrentColumn = null;
+        };
+
+        $scope.MoveItemUp = function (list, index) {
+            if (list && Array.isArray(list)) {
+                var j;
+                var first = list.indexOf(index[0]);
+                if (first > 0) {
+                    for (var i = 0; i < index.length; i++) {
+                        j = list.indexOf(index[i]);
+
+                        if (j > 0) {
+                            list.move(j, j - 1);
+
+                        }
+                    }
+                }
+            }
+        };
+
+        $scope.MoveItemDown = function (list, index) {
+            if (list && Array.isArray(list)) {
+                var j;
+                var last = list.indexOf(index[index.length - 1]);
+                if (last < list.length - 1) {
+                    for (var i = index.length - 1; i > -1; i--) {
+                        j = list.indexOf(index[i]);
+
+                        if (j < list.length - 1) {
+                            list.move(j, j + 1);
+
+                        }
+                    }
+                }
+            }
+        };
+
+        $scope.resetConfig();
+        //$scope.selectedLangOptions = $scope.liftObject.langs;
+
+        $scope.$watch('config.interfaceLang', function () {
+            if ($scope.config.interfaceLang && ["en-US", "es"].indexOf($scope.config.interfaceLang)) {
+                localize.setLanguage($scope.config.interfaceLang);
+            }
+        });
+
+        $scope.addColumn = function () {
+            if ($scope.selectedAvailableColumn) {
+                var pos;
+                if ($scope.selectedCurrentColumn) {
+                    pos = $scope.configListColumns.indexOf($scope.selectedCurrentColumn[$scope.selectedCurrentColumn.length - 1]);
+                }
+                else {
+                    pos = $scope.configListColumns.length;
+                }
+                for (var i = 0; i < $scope.selectedAvailableColumn.length; i++) {
+                    var col = $scope.selectedAvailableColumn[i];
+                    switch (col.writingSystemId) {
+                        case "qaa":
+                            col.writingSystemId = $scope.config.vernacularLang[0];
+                            break;
+                        case "analysis":
+                            col.writingSystemId = $scope.config.analysisLang[0];
+                            break;
+                        case "qaa-Zxxx-x-audio":
+                            if ($scope.project.liftObject.weSayAudioLang) {
+                                col.writingSystemId = $scope.project.liftObject.weSayAudioLang;
+                            }
+                            break;
+                    }
+
+                    $scope.configListColumns.splice(pos + i, 0, col);
+                }
+            }
+        };
+
+        $scope.removeColumn = function () {
+            if ($scope.selectedCurrentColumn) {
+                for (var i = 0; i < $scope.selectedCurrentColumn.length; i++) {
+                    $scope.configListColumns.splice($scope.configListColumns.indexOf($scope.selectedCurrentColumn[i]), 1);
+                }
+                $scope.selectedCurrentColumn.length = 0;
+                $scope.selectedCurrentColumn = null;
+            }
+        };
+
+        $scope.getLanguageName = function (lang) {
+            if (lang) {
+                var ws = $filter('filter')($scope.config.writingSystems, {language: lang})[0];
+                return ws.languageName;
+            }
+        };
+
+        $scope.interfaceLanguages = [
+            {name: "English", lang: "en-US"},
+            {name: "español", lang: "es"}
+        ];
+
+        $scope.closeConfig = function () {
+            window.close();
+        };
+
+        $scope.closeConfigAndSave = function () {
+            global.project.config = angular.copy($scope.config);
+            global.configListColumns = angular.copy(global.listColumns);
+            global.configChanged = true;
+            window.close();
+        };
+    }
+
+    ConfigureCtrl.$inject = ['$scope', '$filter', 'localize'];
+</script>
+
+</body>
+</html>

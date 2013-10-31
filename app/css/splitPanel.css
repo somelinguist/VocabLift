@@ -1,0 +1,118 @@
+.panel {
+}
+
+.panelHSplitter {
+    position: absolute;
+    top: 0px;
+    width: 7px;
+    height: 100%;
+    background-color: lightgray;
+    z-index: 500;
+}
+
+.panelVSplitter {
+    position: absolute;
+    left: 0px;
+    width: 100%;
+    height: 7px;
+    background-color: lightgray;
+    z-index: 500;
+}
+
+.panelHSplitter:hover, .panelHMoving {
+    cursor: e-resize !important;
+}
+
+.panelVSplitter:hover, .panelVMoving {
+    cursor: n-resize !important;
+}
+
+.splitterMoving {
+    background-color: darkgray;
+}
+
+.splitterLimit {
+    background-color: lightgray;
+}
+
+.panelHSplitter .collapserGroup {
+    position: absolute;
+    margin-top: auto;
+    margin-bottom: auto;
+    width: 100%;
+    height: 66px;
+    top: 0px;
+    bottom: 0px
+}
+
+.panelVSplitter .collapserGroup {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    height: 100%;
+}
+
+.panelHSplitter .panelCollapser {
+    height: 32px;
+    position: absolute;
+    margin-bottom: auto;
+    margin-top: auto;
+    top: 0px;
+    bottom: 0px;
+    width: 5px;
+}
+
+.panelVSplitter .panelCollapser {
+    width: 32px;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0px;
+    right: 0px;
+    height: 5px;
+}
+
+.panelCollapser {
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 1px solid darkgray;
+}
+
+.panelHSplitter .panelCollapser:first-child:not(:last-child) {
+    margin-top: -2px;
+}
+
+.panelHSplitter .panelCollapser:last-child:not(:first-child) {
+    top: 34px;
+    margin-bottom: -2px;
+}
+
+.panelVSplitter .panelCollapser:first-child:not(:last-child) {
+    margin-left: -2px;
+    border-right: 1px solid darkgray;
+}
+
+.panelVSplitter .panelCollapser:last-child:not(:first-child) {
+    left: 34px;
+    margin-bottom: -2px;
+}
+
+.panelHSplitter .panelCollapser.pointBefore {
+    background-image: url('../img/leftCollapser.png');
+}
+
+.panelHSplitter .panelCollapser.pointAfter {
+    background-image: url('../img/rightCollapser.png');
+}
+
+.panelVSplitter .panelCollapser.pointAfter {
+    background-image: url('../img/bottomCollapser.png');
+}
+
+.panelVSplitter .panelCollapser.pointBefore {
+    background-image: url('../img/topCollapser.png');
+}
+
+.panelCollapsed {
+    display: none;
+}

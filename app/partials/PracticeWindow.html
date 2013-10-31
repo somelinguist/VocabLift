@@ -1,0 +1,315 @@
+<div id="PracticeWrapper">
+<div class="closeWindow">
+    <button ng-click="closePracticeWindow();">x</button>
+</div>
+<div id="ModeSelector">
+    <span ng-click="switchPracticeMode('Association')" ng-class="{active:practice.mode=='Association'}">{{'_AssociationLabel_' | i18n}}</span>
+    <span ng-click="switchPracticeMode('FlashCard')" ng-class="{active:practice.mode=='FlashCard'}">{{'_FlashCardsLabel_' | i18n}}</span>
+        <span ng-click="switchPracticeMode('Comprehension')"
+              ng-class="{active:practice.mode=='Comprehension'}">{{'_ComprehensionLabel_' | i18n}}</span>
+    <span ng-click="switchPracticeMode('Spelling')" ng-class="{active:practice.mode=='Spelling'}">{{'_SpellingLabel_' | i18n}}</span>
+    <!--<span ng-click="practiceMode='Pronunciation'" ng-class="{active:practiceMode=='Pronunciation'}">{{'_PronunciationLabel_' | i18n}}</span>-->
+</div>
+<div id="ModeContent">
+<div id="PracticeArea">
+<div ng-switch on="practice.mode">
+<div ng-switch-when="Association" ng-controller="AssociationPractice">
+    <div ng-hide="practice.started">
+        <h3>{{'_NewSessionLabel_' | i18n}}</h3>
+
+        <div ng-show="!practiceCards.length">
+            {{'_PracticeNoNewCards_' | i18n}}
+            <button ng-click="closePracticeWindow()">{{'_OK_' | i18n}}</button>
+        </div>
+        <div ng-show="practiceCards.length">
+            <div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
+            <button ng-click="setupAssociation()">{{'_BeginLabel_' | i18n}}</button>
+        </div>
+    </div>
+    <div ng-show="practice.started">
+        <audio id="associationAudio" hidden="true"
+               ng-src="{{currentSet.properties.audio != '' && project.liftObject.directory + project.config.audioInfo.path + currentSet.properties.audio || ''}}"></audio>
+        <div id="AssociationWord">
+            <span>{{currentSet.properties.side1}}</span>
+            <button ng-click="playAudioWord('associationAudio')">▶</button>
+        </div>
+        <div id="AssociationPicture">
+            <img ng-src="{{currentSet.properties.picture != '' && project.liftObject.directory + project.config.picturePath + currentSet.properties.picture || ''}}"
+                 ng-show="currentSet.properties.picture"/>
+
+            <div class="label" ng-show="showGloss">{{currentSet.properties.side2}}</div>
+        </div>
+        <div id="AssociationFooter">
+            <div id="AssociationNav">
+                <button ng-click="prevSet()">{{'_PreviousLabel_' | i18n}}</button>
+                <button ng-click="nextSet()">{{'_NextLabel_' | i18n}}</button>
+            </div>
+            <div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
+        </div>
+    </div>
+</div>
+<div ng-switch-when="FlashCard" ng-controller="FlashCardPractice">
+    <div ng-hide="practice.started">
+        <h3>{{'_NewSessionLabel_' | i18n}}</h3>
+
+        <div ng-show="!practiceCards.length">
+            {{'_PracticeNoNewCards_' | i18n}}
+            <button ng-click="closePracticeWindow()">{{'_OK_' | i18n}}</button>
+        </div>
+        <div ng-show="practiceCards.length">
+            <div><input type="checkbox" ng-model="showSide2First"/> {{'_FlashCardShowSide2FirstLabel_' | i18n}}</div>
+            <!--<div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>-->
+            <button ng-click="setupFlashCard()">{{'_BeginLabel_' | i18n}}</button>
+        </div>
+    </div>
+    <div ng-show="practice.started">
+        <audio id="flashCardAudio" hidden="true"
+               ng-src="{{currentSet.properties.audio != '' && project.liftObject.directory + project.config.audioInfo.path + currentSet.properties.audio || ''}}"></audio>
+
+        <div id="FlashCardArea" ng-switch on="currentSet.currentSide">
+            <div class="flashCard side1" ng-switch-when="1" ng-click="currentSet.currentSide = 2;">
+                <div>{{currentSet.properties.side1}}</div>
+                <div class="playButton" ng-show="!showSide2First">
+                    <button ng-click="playAudioWord('flashCardAudio', $event)">▶</button>
+                </div>
+            </div>
+            <div class="flashCard" ng-switch-when="2" ng-click="nextSet()">{{currentSet.properties.side2}}
+                <div class="playButton" ng-show="showSide2First">
+                    <button ng-click="playAudioWord('flashCardAudio', $event)">▶</button>
+                </div>
+            </div>
+            <!--<div id="FlashCardAreaButton"><button ng-click="playAudioWord('flashCardAudio')">▶</button></div>-->
+            <!--<div class="cardNumber">{{ currentItemIndex + 1 }}</div>-->
+        </div>
+
+        <!--<div id="FlashCardPicture">
+            <img ng-src="{{currentSet.properties.picture}}" ng-show="currentSet.properties.picture"/>
+
+            <div class="label" ng-show="showGloss">{{currentSet.properties.side2}}</div>
+        </div>-->
+        <div id="FlashCardFooter">
+            <div id="FlashCardNav">
+                <button ng-click="prevSet()">{{'_PreviousLabel_' | i18n}}</button>
+                <button ng-click="currentSet.currentSide = 1">{{'_ResetLabel_' | i18n}}</button>
+                <button ng-click="nextSet()">{{'_NextLabel_' | i18n}}</button>
+            </div>
+            <div id="FlashCardProgress" data-i18n="_FlashCardProgress_|{{currentItemIndex+1}}|{{FlashCardTotal}}">
+            </div>
+            <!--<div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
+            <div><input type="checkbox" ng-model="showPicture"/> Show pictures</div>-->
+        </div>
+    </div>
+</div>
+<div ng-switch-when="Comprehension" ng-controller="ComprehensionPractice">
+    <div ng-hide="practice.started">
+
+        <div class="practiceOldSessions" ng-show="unfinishedSessions && unfinishedSessions.length">
+            <h3>{{'_UnfinishedSessionsLabel_' | i18n}}</h3>
+            <select multiple="true" ng-model="useSession"
+                    ng-options="session.dateModified for session in unfinishedSessions">
+            </select>
+            <button ng-click="setupComprehension(useSession[0].sessionId)"
+                    ng-disabled="!useSession">
+                {{'_FinishOldSessionLabel_' | i18n}}
+            </button>
+            <button ng-click="deleteOldSession(useSession)"
+                    ng-disabled="!useSession">
+                {{'_DeleteOldSessionLabel_' | i18n}}
+            </button>
+        </div>
+        <div class="practiceNewSessions">
+            <h3>{{'_NewSessionLabel_' | i18n}}</h3>
+
+            <div ng-show="!practiceCards.length">
+                {{'_PracticeNoNewCards_' | i18n}}
+                <button ng-click="closePracticeWindow()">{{'_OK_' | i18n}}</button>
+            </div>
+            <div ng-show="practiceCards.length">
+                <div>
+                    <span>{{'_NumberOfCardsPerSet_' | i18n}}: </span>
+                    <input type=text ng-model="project.config.comprehensionOptions.setSize"/>
+                </div>
+                <div>
+                    <span>{{'_MaximumNumberOfAttempts_' | i18n}}: </span>
+                    <input type=text ng-model="project.config.comprehensionOptions.maxAttempts"/>
+                </div>
+
+                <div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
+                <div>
+                    <button ng-click="setupComprehension()"
+                            ng-disabled="practiceCards.length < project.config.comprehensionOptions.setSize">
+                        {{'_BeginLabel_' | i18n}}
+                    </button>
+                    <div class="practiceSetupWarning"
+                         ng-show="practiceCards.length < project.config.comprehensionOptions.setSize">
+                        {{'_ComprehensionSetSizeWarningText_' | i18n}}: {{practiceCards.length}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-show="practice.started">
+        <audio id="wordAudio" hidden="true"
+               ng-src="{{currentSet.set.item.properties.audio != '' && project.liftObject.directory + project.config.audioInfo.path + currentSet.set.item.properties.audio || ''}}"></audio>
+        <div id="ComprehensionWord">{{currentSet.set.item.properties.side1}}
+            <button ng-click="playAudioWord('wordAudio')">▶</button>
+        </div>
+        <div id="PracticeCards">
+            <div class="comprehensionCard " ng-repeat="card in currentSet.set.group"
+                 ng-click="attempt(card.guid)">
+                <img ng-src="{{card.properties.picture != '' && project.liftObject.directory + project.config.picturePath + card.properties.picture || ''}}"/>
+
+                <div class="label" ng-show="showGloss">{{card.properties.side2}}</div>
+                <div class="answer"
+                     ng-class="{correct:isCorrect(card.guid), incorrect:!isCorrect(card.guid)}"
+                     ng-show="wasAttempted(card.guid) || currentSet.attempts.length == project.config.comprehensionOptions.maxAttempts"></div>
+            </div>
+        </div>
+        <div id="ComprehensionFooter">
+            <div id="ComprehensionNav">
+                <button ng-click="prevSet()">{{'_PreviousLabel_' | i18n}}</button>
+                <button ng-click="nextSet()">{{'_NextLabel_' | i18n}}</button>
+            </div>
+            <div id="ComprehensionProgress">
+                <span data-i18n="_ComprehensionProgress_|{{currentSession.completed}}|{{currentSession.sessionData.length}}"></span>
+                <span>{{'_CorrectLabel_' | i18n}}: {{currentSession.correct}} </span>
+                <span>{{'_IncorrectLabel_' | i18n}}: {{currentSession.incorrect}}</span>
+            </div>
+            <div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
+        </div>
+    </div>
+</div>
+<div ng-switch-when="Spelling" ng-controller="SpellingPractice">
+    <div ng-hide="practice.started">
+        <div class="practiceOldSessions" ng-show="unfinishedSessions && unfinishedSessions.length">
+            <h3>{{'_UnfinishedSessionsLabel_' | i18n}}</h3>
+            <select multiple="true" ng-model="useSession"
+                    ng-options="session.dateModified for session in unfinishedSessions">
+            </select>
+            <button ng-click="setupSpelling(useSession[0].sessionId)"
+                    ng-disabled="!useSession">
+                {{'_FinishOldSessionLabel_' | i18n}}
+            </button>
+            <button ng-click="deleteOldSession(useSession)"
+                    ng-disabled="!useSession">
+                {{'_DeleteOldSessionLabel_' | i18n}}
+            </button>
+        </div>
+        <div class="practiceNewSessions">
+            <h3>{{'_NewSessionLabel_' | i18n}}</h3>
+
+            <div ng-show="!practiceCards.length">
+                {{'_PracticeNoNewCards_' | i18n}}
+                <button ng-click="closePracticeWindow()">{{'_OK_' | i18n}}</button>
+            </div>
+            <div ng-show="practiceCards.length">
+                <div>
+                    <span>{{'_MaximumNumberOfAttempts_' | i18n}}: </span>
+                    <input type="text" ng-model="project.config.spellingOptions.maxAttempts"/>
+                </div>
+                <div>
+                    <input type="checkbox" ng-model="project.config.spellingOptions.checkDiacritics"/>
+                    <span> {{'_CheckDiacritics_' | i18n}}</span>
+                </div>
+                <div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
+                <button ng-click="setupSpelling()">{{'_BeginLabel_' | i18n}}</button>
+            </div>
+        </div>
+    </div>
+    <div ng-show="practice.started">
+        <audio id="spellingAudio" hidden="true"
+               ng-src="{{currentSet.set.item.properties.audio != '' && project.liftObject.directory + project.config.audioInfo.path + currentSet.set.item.properties.audio || ''}}"></audio>
+        <div id="SpellingWord">
+            <span ng-show="showGloss">{{currentSet.set.item.properties.side2}}</span>
+            <button ng-click="playAudioWord('spellingAudio')">▶</button>
+        </div>
+        <div id="SpellingResponse">
+            <span>{{'_AnswerLabel_' | i18n}}: </span>
+
+            <form ng-submit="attempt()">
+                <input ng-model="answer" lang="{{spellingLang}}"/>
+                <input type="submit" value="Check"/>
+                                <span class="answer"
+                                      ng-class="{correct:currentSet.correct, incorrect:!currentSet.correct}"
+                                      ng-show="currentSet.attempts.length > 0"></span>
+            </form>
+        </div>
+        <div id="SpellingAnswer"
+             ng-show="currentSet.correct || currentSet.attempts.length == project.config.spellingOptions.maxAttempts">
+            {{currentSet.set.item.properties.side1}}
+        </div>
+        <div id="SpellingPicture">
+            <img ng-src="{{currentSet.set.item.properties.picture != '' && project.liftObject.directory + project.config.picturePath + currentSet.set.item.properties.picture || ''}}"
+                 ng-show="currentSet.set.item.properties.picture"/>
+        </div>
+        <div id="SpellingFooter">
+            <div id="SpellingNav">
+                <button ng-click="prevSet()">{{'_PreviousLabel_' | i18n}}</button>
+                <button ng-click="nextSet()">{{'_NextLabel_' | i18n}}</button>
+            </div>
+            <div id="SpellingProgress">
+                <span data-i18n="_SpellingProgress_|{{currentSession.completed}}|{{currentSession.sessionData.length}}"></span>
+                <span>{{'_CorrectLabel_' | i18n}}: {{currentSession.correct}} </span>
+                <span>{{'_IncorrectLabel_' | i18n}}: {{currentSession.incorrect}}</span>
+            </div>
+            <div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
+        </div>
+    </div>
+</div>
+<!--<div ng-switch-when="Pronunciation" ng-controller="PronunciationPractice">
+    <div ng-hide="practice.started">
+        <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
+        <button ng-click="setupPronunciation()">Begin</button>
+    </div>
+    <div ng-show="practice.started">
+        <audio id="pronWordAudio" hidden="true" ng-src="{{currentSet.properties.audio}}"></audio>
+        <audio id="pronSayAudio" controls></audio>
+        <div id="PronunciationWord">
+            <span>{{currentSet.properties.side1}}</span>
+            <button ng-click="playAudioWord('pronWordAudio')">▶</button>
+        </div>
+        <div id="PronunciationSay">
+            <div>Recording:</div>
+            <span ng-switch on="audioStatus">
+                <button ng-switch-when="stopped" id="recordPronunciationButton" ng-click="recordAudio()">⚫</button>
+                <button ng-switch-when="recording" ng-click="stopRecordAudio()">■</button>
+            </span>
+            <button ng-disabled="audioStatus=='recording'" ng-click="playAudioWord('pronSayAudio')">▶</button>
+        </div>
+        <div id="PronunciationPicture">
+            <img ng-src="{{currentSet.properties.picture}}" ng-show="currentSet.properties.picture"/>
+            <div class="label" ng-show="showGloss">{{currentSet.properties.side2}}</div>
+        </div>
+        <div id="PronunciationFooter">
+            <div id="PronunciationNav">
+                <button ng-disabled="audioStatus=='recording'" ng-click="prevSet()">Previous</button>
+                <button ng-disabled="audioStatus=='recording'" ng-click="nextSet()">Next</button>
+            </div>
+            <div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
+        </div>
+    </div>
+</div>-->
+</div>
+</div>
+</div>
+<!--<div id="PracticeSessionFinished" ng-show="practice.finished">
+    <h2>Session Finished</h2>
+    <div ng-switch on="practice.finished">
+        <div ng-switch-whe="!practice.finished"></div>
+        <div ng-switch-when="true" ng-controller="PracticeSessionFinishedCtrl">
+            <div>
+                <h3>Session Statistics</h3>
+                <div>Completed: {{currentSession.completed}} of {{currentSession.sessionData.length}}</div>
+                <div>Correct: {{currentSession.correct}}</div>
+                <div>Incorrect: {{currentSession.incorrect}}</div>
+            </div>
+            <div>
+                <h3>What do you want to do next?</h3>
+                <div>Use the same set of cards with a different practice mode.</div>
+                <div>Repeat this session.</div>
+                <div>View detailed statistics about this session.</div>
+            </div>
+        </div>
+    </div>
+</div>-->
+</div>

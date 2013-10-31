@@ -1,0 +1,29 @@
+<div id="NewCardWindowContainer">
+    <div class="cardFields">
+        <h3>{{'_NewCard_' | i18n}}</h3>
+
+        <div class="cardField">
+            <div class="label">{{'_Side1_' | i18n}}:</div>
+            <div class="cardData">
+                <input lang="{{project.config.vernacularLang[0]}}" ng-model="newCard.side1"/>
+            </div>
+        </div>
+        <div class="cardField">
+            <div class="label">{{'_Side2_' | i18n}}:</div>
+            <div class="cardData">
+                <input lang="{{project.config.analysisLang[0]}}" ng-model="newCard.side2"/>
+            </div>
+        </div>
+        <button ng-click="createNewCardSubmit()" ng-disabled="!newCard.side1">{{'_CreateNewCard_' | i18n}}</button>
+        <button ng-click="closeNewCardWindow()">{{'_Cancel_' | i18n}}</button>
+    </div>
+    <div id="NewCardCheckEntries">
+        <h4>{{'_SimilarDictionaryEntries_' | i18n}}</h4>
+        <select multiple="true" ng-model="newCardEntryMatch.selection"
+                ng-options="entry.entry as entry.headWord + ': ' + getSenseString(entry.entry) for entry in newCardEntryMatches"
+                lang="{{project.config.vernacularLang[0]}}"></select>
+        <button ng-click="newCardFromEntryMatch()" ng-disabled="!newCardEntryMatch.selection.length">
+            {{'_CreateCardFromDictionaryEntries_' | i18n}}
+        </button>
+    </div>
+</div>
