@@ -1,1 +1,0 @@
-pref("vocablift.history", "[]");
