@@ -1,0 +1,89 @@
+<html lang="en" ng-app="VocabLiftSessionsManager">
+<head>
+    <link rel="stylesheet" href="lib/ng-grid-2.0.7/ng-grid.css"/>
+    <link href="css/sessionsWindow.css" rel="stylesheet"/>
+</head>
+<body ng-controller="SessionsManagerController">
+<script>
+    var gui = require('nw.gui');
+    var win = gui.Window.get();
+    //win.showDevTools();
+</script>
+<div id="SessionsContainer">
+    <div class="gridStyle" ng-grid="sessionGridOptions">
+    </div>
+</div>
+<div id="SessionInfo">
+    <div id="SessionToolbar">
+        <button ng-click="deleteAllSessions()">{{'_DeleteAllSessions_' | i18n}}</button>
+        <button ng-click="deleteSession(currentSession)">{{'_DeleteThisSession_' | i18n}}</button>
+    </div>
+    <div class="sessionInfoField">
+        <span class="label">{{'_DateCreated_' | i18n}}:</span>
+        {{currentSession.dateCreated}}
+    </div>
+    <div class="sessionInfoField">
+        <span class="label">{{'_DateModified_' | i18n}}:</span>
+        {{currentSession.dateModified}}
+    </div>
+    <div class="sessionInfoField">
+        <span class="label">{{'_TypeLabel_' | i18n}}:</span>
+        {{currentSession.type}}
+    </div>
+    <div class="sessionInfoField">
+        <span class="label">{{'_ProgressLabel_' | i18n}}:</span>
+        <span data-i18n="_SessionProgressText_|{{currentSession.completed}}|{{currentSession.sessionData.length}}"></span>
+    </div>
+    <div class="sessionInfoField">
+        <span class="label">{{'_CorrectLabel_' | i18n}}:</span>
+        {{currentSession.correct}}
+    </div>
+    <div class="sessionInfoField">
+        <span class="label">{{'_IncorrectLabel_' | i18n}}:</span>
+        {{currentSession.incorrect}}
+    </div>
+    <div class="sessionInfoField">
+        <span class="label">{{'_QuickPracticeLabel_' | i18n}}:</span>
+        {{currentSession.quickPractice}}
+    </div>
+    <div class="sessionInfoField">
+        <span class="label">{{'_DecksIncludedLabel_' | i18n}}:</span>
+        <select multiple="true" ng-model="selectedDecks"
+                ng-options="deck.name for deck in currentSessionDecks"></select>
+    </div>
+    <div class="sessionInfoField">
+        <span class="label">{{'_CardsIncludedLabel_' | i18n}}:</span>
+        <select multiple="true" ng-model="selectedCards"
+                ng-options="card as card.set.item.properties.side1 for card in currentSession.sessionData"
+                lang="{{projectConfig.vernacularLang[0]}}"></select>
+    </div>
+    <div id="SessionCardData">
+        <h3>{{'_CardInfoLabel_' | i18n}}:</h3>
+
+        <div class="sessionCardDataField">
+            <span class="label">{{currentCard.set.item.properties.side1}}:</span>
+            {{currentCard.set.item.properties.side2}}
+        </div>
+        <div class="sessionCardDataRelated">
+            <div>{{'_SeeFullCardStatisticsLabel_' | i18n}}</div>
+        </div>
+        <h4>{{'_CurrentSessionStatisticsLabel_' | i18n}}:</h4>
+
+        <div class="sessionCardDataField">
+            <span class="label">{{'_CorrectLabel_' | i18n}}:</span>
+            {{currentCard.correct}}
+        </div>
+        <div class="sessionCardDataField">
+            <span class="label">{{'_AttemptsLabel_' | i18n}}:</span>
+            <select multiple="true" ng-model="selectedAttempts" ng-options="card for card in currentCardAttempts"
+                    lang="{{projectConfig.vernacularLang[0]}}"></select>
+        </div>
+    </div>
+</div>
+<script src="lib/jquery/jquery.js"></script>
+<script src="lib/angular/angular.js"></script>
+<script src="lib/localize/localize.js"></script>
+<script src="lib/ng-grid-2.0.7/ng-grid.debug.js"></script>
+<script src="js/sessionsManagerController.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<div id="CardStatistics" ng-controller="CardStatisticsController">
+    <div class="closeWindow">
+        <button ng-click="closeCardStatisticsWindow();">x</button>
+    </div>
+    <div class="cardInfo">
+        <span class="cardSide1" lang="{{project.config.vernacularLang[0]}}">{{currentCard.properties.side1}}</span>
+        <span class="cardSide2" lang="{{project.config.analysisLang[0]}}">{{currentCard.properties.side2}}</span>
+    </div>
+    <div id="CardStatisticsGrid">
+        <div class="cardGridStyle" ng-grid="cardStatisticsGridOptions">
+        </div>
+    </div>
+</div>

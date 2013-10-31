@@ -1,0 +1,957 @@
+/* app css stylesheet */
+html, body, #MainContainer {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+
+[ng\:cloak], [ng-cloak], .ng-cloak {
+    display: none !important;
+}
+
+.hide {
+    display: none;
+}
+
+.show {
+    display: block !important;
+}
+
+#Toolbar {
+    width: 100%;
+}
+
+.menu {
+    list-style: none;
+    border-bottom: 0.1em solid black;
+    margin-bottom: 2em;
+    padding: 0 0 0.5em;
+}
+
+.menu:before {
+    content: "[";
+}
+
+.menu:after {
+    content: "]";
+}
+
+.menu > li {
+    display: inline;
+}
+
+.menu > li:before {
+    content: "|";
+    padding-right: 0.3em;
+}
+
+.menu > li:nth-child(1):before {
+    content: "";
+    padding: 0;
+}
+
+#MainSubContainer {
+    position: relative;
+    top: 0px;
+    left: 0px;
+    width: 99%;
+    height: 95%;
+    margin: auto;
+    border: 1px solid rgb(212, 212, 212);
+    overflow: hidden;
+}
+
+.panelContainer {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    right: 3px;
+    left: 3px;
+}
+
+#LiftDictionary {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 50%;
+    height: 100%;
+}
+
+#LiftDictionary .gridStyle {
+    width: 100%;
+    height: 96%;
+}
+
+.DictionaryLabel {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/*.ngHeaderContainer {
+    height: 55px !important;
+}*/
+
+.ngGroupPanel {
+    height: 30px !important;
+}
+
+.headerFilter {
+    position: absolute;
+    top: 29px;
+}
+
+.ngGrid .headerFilter input {
+    width: 95%;
+    left: 2px;
+    height: 16px;
+}
+
+.ngTopPanel, .ngViewport, .ngFooterPanel {
+    border: 1px solid rgb(212, 212, 212);
+}
+
+.dropdown-detail {
+    background-clip: padding-box;
+    background-color: #FFFFFF;
+    border-color: rgba(0, 0, 0, 0.2);
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    float: left;
+    left: 0;
+    list-style: none outside none;
+    min-width: 95%;
+    padding: 4px 0;
+    position: absolute;
+    top: 100%;
+    z-index: 10000;
+}
+
+.dropdown.open .dropdown-detail {
+    display: block;
+}
+
+.dropdown-detail table {
+    width: 100%;
+}
+
+.dropdown-detail td {
+    vertical-align: top;
+}
+
+.label {
+    background-color: #FFFFFF;
+    color: black;
+    text-shadow: 0 0 0;
+    width: 20%
+}
+
+td.label {
+    display: table-cell !important;
+}
+
+.senseLabel {
+    font-weight: bold;
+}
+
+.lang {
+    display: inline-block;
+    width: 20%;
+}
+
+#RightPanel {
+    position: absolute;
+    left: 50%;
+    top: 0px;
+    width: 50%;
+    min-width: 100px;
+    height: 99%;
+    overflow: auto;
+}
+
+.deck {
+
+}
+
+.deck.dropZone {
+    background-color: lightgray;
+    border: 1px dashed black;
+    opacity: 0.6;
+}
+
+.deck:hover .deckRemover, .card:hover .cardRemover {
+    background-image: url("../icons/onebit/onebit-33.png");
+    background-size: 16px 16px;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    float: right;
+}
+
+.deckExpander {
+    background-size: 18px 18px;
+    height: 18px;
+    width: 18px;
+    display: inline-block;
+}
+
+.deckExpander.open {
+    background-image: url("../icons/xp_icandy/open_folder_yellow.png");
+}
+
+.deckExpander.closed {
+    background-image: url("../icons/xp_icandy/closed_folder_yellow.png");
+}
+
+.activeDeck > .deckName {
+    background-color: blue;
+    color: white;
+}
+
+.deckData {
+    border-left: 1px dotted rgb(212, 212, 212);
+    margin-left: 8px;
+    padding-left: 10px;
+}
+
+.card {
+    position: relative;
+}
+
+.card.selected {
+    background-color: lightblue;
+}
+
+.deck.dropZone .card.selected {
+    background-color: gray;
+    color: white;
+}
+
+.cardExpander {
+    background-image: url("../icons/onebit/onebit-39.png");
+    background-size: 16px 16px;
+    height: 16px;
+    width: 16px;
+    display: inline-block;
+}
+
+#CardView {
+    height: 35%;
+    border-bottom: 1px solid lightgray;
+    overflow: auto;
+    padding-left: 10px;
+}
+
+.cardHeader, .cardFooter {
+    position: relative;
+}
+
+.cardHeader .cardPicture {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 120px;
+    height: 120px;
+    border: 1px solid black;
+}
+
+.cardHeader .cardPicture img {
+    width: 120px;
+    height: 120px;
+}
+
+.cardHeader .cardPicture .cardPictureOverlay {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    width: 100%;
+    height: 100%;
+}
+
+.cardHeader .cardPicture .cardPictureOverlay div {
+    margin: auto;
+}
+
+.cardHeader .cardPicture #PictureRemoverPicture {
+    display: none;
+}
+
+.cardHeader .cardPicture:hover #PictureRemoverPicture {
+    background-image: url("../icons/onebit/onebit-33.png");
+    background-size: 16px 16px;
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    display: block;
+    top: 0px;
+    right: 0px;
+}
+
+.cardField #PictureRemoverForm, .cardField #AudioRemoverForm {
+    display: none;
+}
+
+.cardField:hover #PictureRemoverForm, .cardField:hover #AudioRemoverForm {
+    background-image: url("../icons/onebit/onebit-33.png");
+    background-size: 16px 16px;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+}
+
+.cardHeadword {
+    display: inline-block;
+    width: 30%;
+    font-weight: bold;
+}
+
+.cardSense {
+    margin-left: 10px;
+}
+
+.cardSense select {
+    width: 40%;
+}
+
+.cardEditButton {
+    display: none;
+}
+
+.card:hover .cardEditButton {
+    display: inline-block;
+}
+
+.dropdown-detail.cardEdit {
+    min-width: 80%;
+    padding: 5px 7px;
+}
+
+.cardViewEdit .cardHeadword {
+    font-size: 22px;
+}
+
+.cardViewEdit .cardFields {
+    width: 100%;
+}
+
+.cardViewEdit .cardField {
+    width: 100%;
+}
+
+.cardField div.label {
+    float: left;
+    width: 15%;
+}
+
+.cardField div.cardData {
+    display: inline-block;
+    width: 50%;
+    overflow: hidden;
+}
+
+.cardField div.cardData input {
+    width: 98%;
+}
+
+.cardField div.cardData select {
+    width: 87%;
+}
+
+.cardField div.cardData button {
+    width: 11%;
+}
+
+.cardEdit span.label {
+    display: inline-block;
+    width: 15%;
+}
+
+.cardEdit select {
+    width: 50%;
+}
+
+.cardEdit input {
+    width: 49%;
+}
+
+#Decks {
+    margin-top: 5px;
+    height: 62.5%;
+}
+
+#DeckToolbar {
+    height: 35px;
+    margin-left: 10px;
+}
+
+#DeckList {
+    height: 94%;
+    overflow-y: auto;
+}
+
+#DeckListContainer {
+    margin-left: 10px;
+}
+
+.closeWindow {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+#ModalBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    opacity: 0.7;
+    z-index: 10000;
+}
+
+#ConfigWindow {
+    background-color: #ffffff;
+    opacity: 1.0;
+    position: absolute;
+    margin: auto;
+    top: 10%;
+    left: 5%;
+    right: 5%;
+    bottom: 10%;
+    z-index: 10001;
+}
+
+#ConfigContainer {
+    position: absolute;
+    top: 0.5%;
+    bottom: 0.5%;
+    left: 0.5%;
+    right: 0.5%;
+}
+
+#ConfigSaveCancelToolbar {
+    width: 100%;
+    height: 28px;
+    border-bottom: lightgray;
+}
+
+#ConfigSettingsContainer {
+    width: 100%;
+    height: 94%;
+    overflow-y: auto;
+}
+
+#LanguageConfig {
+    position: relative;
+    height: 200px;
+    width: 100%;
+}
+
+#InterfaceLangConfig {
+    width: 100%;
+}
+
+#VernacularLangConfig {
+    position: absolute;
+    top: 40px;
+    left: 0px;
+    width: 50%;
+    height: 80%;
+}
+
+#AnalysisLangConfig {
+    position: absolute;
+    top: 40px;
+    right: 0px;
+    width: 50%;
+    height: 80%;
+}
+
+#columnsConfig {
+    position: relative;
+    height: 180px;
+    width: 100%;
+}
+
+#AvailableColumns {
+    position: absolute;
+    top: 20px;
+    left: 0px;
+    width: 50%;
+    height: 80%;
+}
+
+#CurrentColumns {
+    position: absolute;
+    top: 20px;
+    right: 0px;
+    width: 50%;
+    height: 80%;
+}
+
+#TaskSettings {
+    position: relative;
+}
+
+#ConfigContainer .title {
+    font-weight: bold;
+}
+
+#ConfigContainer .listbox {
+    position: absolute;
+    top: 20px;
+    left: 0px;
+    width: 50%;
+    height: 80%;
+}
+
+#ConfigContainer .listbox select {
+    height: 100%;
+    width: 100%;
+}
+
+#ConfigContainer .buttons {
+    position: absolute;
+    top: 20px;
+    right: 0px;
+    width: 50%;
+    height: 80%;
+}
+
+#ConfigContainer .buttons button {
+    display: block;
+}
+
+#CardStatisticsWindow {
+    background-color: #ffffff;
+    opacity: 1.0;
+    position: absolute;
+    margin: auto;
+    top: 2%;
+    left: 1%;
+    right: 1%;
+    bottom: 2%;
+    z-index: 10001;
+    overflow: auto;
+}
+
+#CardStatistics {
+    height: 100%;
+}
+
+#CardStatistics .cardSide1 {
+    font-weight: bold;
+}
+
+#CardStatisticsGrid {
+    height: 90%;
+    width: 100%;
+}
+
+#CardStatisticsGrid .cardGridStyle {
+    width: 99%;
+    height: 100%;
+}
+
+#NewCardWindow {
+    background-color: #ffffff;
+    opacity: 1.0;
+    position: absolute;
+    margin: auto;
+    top: 25%;
+    left: 20%;
+    right: 20%;
+    bottom: 25%;
+    z-index: 10001;
+    overflow: auto;
+}
+
+#NewCardWindowContainer {
+    padding: 15px;
+    padding-top: 0px;
+    width: 95%;
+    height: 80%;
+}
+
+#NewCardWindowContainer .cardFields {
+    height: 120px;
+    width: 100%;
+}
+
+#NewCardCheckEntries {
+    width: 100%;
+    height: 45%;
+}
+
+#NewCardCheckEntries select {
+    width: 80%;
+    height: 80%;
+}
+
+#SaveCardAlert, #DeleteDeckAlert {
+    background-color: #ffffff;
+    opacity: 1.0;
+    position: absolute;
+    margin: auto;
+    top: 35%;
+    left: 40%;
+    right: 40%;
+    bottom: 35%;
+    padding: 10px;
+    z-index: 10001;
+    overflow: auto;
+}
+
+#PracticeWindow {
+    background-color: #ffffff;
+    opacity: 1.0;
+    position: absolute;
+    margin: auto;
+    top: 2%;
+    left: 1%;
+    right: 1%;
+    bottom: 2%;
+    z-index: 10001;
+    overflow: auto;
+}
+
+#PracticeWrapper {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+#ModeSelector {
+    left: 0;
+    position: absolute;
+    top: 1px;
+}
+
+#ModeSelector span {
+    border: 1px solid black;
+    display: inline-block;
+    height: 21px;
+    line-height: 21px;
+    margin-left: 1px;
+    padding: 0 10px;
+    position: relative;
+    top: 0;
+}
+
+#ModeSelector span.active {
+    background: none repeat scroll 0 0 white;
+    border-width: 2px 3px 0;
+    font-weight: bold;
+    padding-bottom: 1px;
+    z-index: 1;
+}
+
+#ModeContent {
+    border-top: 1px solid black;
+    bottom: 0;
+    left: 0;
+    margin-top: 1px;
+    position: absolute;
+    right: 0;
+    top: 23px;
+}
+
+#PracticeArea {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 70%;
+}
+
+#AssociationWord {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20pt;
+}
+
+#AssociationWord button {
+    margin-left: 5px;
+}
+
+#AssociationPicture {
+    margin: 10px auto;
+    text-align: center;
+    border: 1px solid black;
+    width: 400px;
+    height: 400px;
+    position: relative;
+}
+
+#AssociationPicture img {
+    width: 400px;
+    height: 400px;
+}
+
+#AssociationPicture .label {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 48px;
+    line-height: 48px;
+    font-size: 20px;
+    width: 400px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+}
+
+#AssociationFooter {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#FlashCardArea {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 400px;
+    border: 1px solid black;
+    height: 200px;
+    position: relative;
+}
+
+#FlashCardArea .flashCard {
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 65px;
+    overflow-y: auto;
+    width: 400px;
+    height: 135px;
+    text-align: center;
+    background-color: white;
+    font-size: 48px;
+
+}
+
+#FlashCardArea .side1 {
+    font-weight: bold;
+}
+
+#FlashCardArea .playButton button {
+    z-index: 10000;
+}
+
+#FlashCardAreaButton {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    width: 30px;
+    height: 30px;
+}
+
+#FlashCardArea .cardNumber {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+}
+
+#FlashCardFooter {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    margin-top: 5px;
+}
+
+#FlashCardProgress {
+    margin-top: 5px;
+}
+
+#ComprehensionWord {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20pt;
+}
+
+#ComprehensionWord button {
+    margin-left: 5px;
+}
+
+#PracticeCards {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+
+}
+
+#ComprehensionFooter {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.comprehensionCard {
+    width: 200px;
+    height: 200px;
+    border: 1px solid black;
+    overflow: hidden;
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+}
+
+.comprehensionCard img {
+    width: 200px;
+    height: 200px;
+}
+
+.comprehensionCard .label {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 24px;
+    line-height: 24px;
+    width: 200px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+}
+
+.comprehensionCard .answer {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    width: 48px;
+    height: 48px;
+    background-repeat: no-repeat;
+    background-size: 48px 48px;
+}
+
+.comprehensionCard .answer.correct {
+    background-image: url("../icons/onebit/onebit-34.png");
+}
+
+.comprehensionCard .answer.incorrect {
+    background-image: url("../icons/onebit/onebit-33.png");
+}
+
+#SpellingWord {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20pt;
+}
+
+#SpellingWord button {
+    margin-left: 5px;
+}
+
+#SpellingResponse, #SpellingAnswer {
+    text-align: center;
+}
+
+#SpellingAnswer {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#SpellingResponse .answer {
+    display: inline-block;
+    margin-left: 5px;
+    margin-top: -10px;
+    width: 36px;
+    height: 36px;
+    background-repeat: no-repeat;
+    background-size: 36px 36px;
+}
+
+#SpellingResponse .answer.correct {
+    background-image: url("../icons/onebit/onebit-34.png");
+}
+
+#SpellingResponse .answer.incorrect {
+    background-image: url("../icons/onebit/onebit-33.png");
+}
+
+#SpellingPicture {
+    margin: 10px auto;
+    text-align: center;
+    border: 1px solid black;
+    width: 350px;
+    height: 350px;
+}
+
+#SpellingPicture img {
+    width: 350px;
+    height: 350px;
+}
+
+#SpellingFooter {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#PronunciationWord {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20pt;
+}
+
+#PronunciationSay {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 400px;
+}
+
+#PronunciationSay {
+    text-align: center;
+}
+
+#PronunciationPicture {
+    margin: 10px auto;
+    text-align: center;
+    border: 1px solid black;
+    width: 400px;
+    height: 400px;
+    position: relative;
+}
+
+#PronunciationPicture img {
+    width: 400px;
+    height: 400px;
+}
+
+#PronunciationPicture .label {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 48px;
+    line-height: 48px;
+    font-size: 20px;
+    width: 400px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+}
+
+#PronunciationFooter {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#recordPronunciationButton {
+    color: red;
+}
