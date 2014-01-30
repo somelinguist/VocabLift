@@ -330,27 +330,32 @@
         "description": "Text for Cancel buttons"
     },
     {
-        "key": "_AssociationLabel_",
+        "key": "_Association_",
         "value": "Association",
         "description": "Text for Association labels"
     },
     {
-        "key": "_FlashCardsLabel_",
+        "key": "_FlashCards_",
         "value": "Flash Cards",
         "description": "Text for Flash Cards labels"
     },
     {
-        "key": "_ComprehensionLabel_",
+        "key": "_Comprehension_",
         "value": "Comprehension",
         "description": "Text for Comprehension"
     },
-    {
-        "key": "_SpellingLabel_",
+	{
+        "key": "_Memory_",
+        "value": "Memory",
+        "description": "Text for Memory label"
+    },
+	{
+        "key": "_Spelling_",
         "value": "Spelling",
         "description": "Text for Spelling label"
     },
     {
-        "key": "_PronunciationLabel_",
+        "key": "_Pronunciation_",
         "value": "Pronunciation",
         "description": "Text for Pronunciation labels"
     },
@@ -518,5 +523,165 @@
         "key": "_DeleteAlert_",
         "value": "Are you sure you want to delete this deck?",
         "description": "Text for delete deck warning."
+    },
+    {
+        "key": "_StudyWhat_",
+        "value": "What do you want to study?",
+        "description": "Text for Deck selector."
+    },
+    {
+        "key": "_YouAreStudying_",
+        "value": "You're studying",
+        "description": "Text for Active Deck in Mode selector."
+    },
+    {
+        "key": "_HowStudy_",
+        "value": "How do you want to study?",
+        "description": "Text for Mode Selector."
+    },
+    {
+        "key": "_PairsRemaining_",
+        "value": "Pairs Remaining:",
+        "description": "Text for Pairs Remaining."
+    },
+    {
+        "key": "_TimeElapsed_",
+        "value": "Time Elapsed:",
+        "description": "Text for Time Elapsed."
+    },
+    {
+        "key": "_YouFinished_",
+        "value": "You finished!",
+        "description": "Text for You Finished."
+    },
+    {
+        "key": "_TryAnotherActivity_",
+        "value": "Try another activity",
+        "description": "Text for Try Another Activity."
+    },
+    {
+        "key": "_QuityActivity_",
+        "value": "Quit Activity",
+        "description": "Text for Quit Activity."
+    },
+    {
+        "key": "_ClickOnACard_",
+        "value": "Click on a card",
+        "description": "Text for Click on a card."
+    },
+    {
+        "key": "_ChooseAnotherCard_",
+        "value": "Choose another card",
+        "description": "Text for Choose another card."
+    },
+    {
+        "key": "_TryAgain_",
+        "value": "Try again",
+        "description": "Text for Try again."
+    },
+    {
+        "key": "_GoodJob_",
+        "value": "Good job!",
+        "description": "Text for Good job."
+    },
+    {
+        "key": "_YouWon_",
+        "value": "You won!",
+        "description": "Text for You won."
+    },
+    {
+        "key": "_MemoryRound_",
+        "value": "Round",
+        "description": "Text for Memory Round."
+    },
+    {
+        "key": "_TotalTime_",
+        "value": "Total:",
+        "description": "Text for Memory Total time."
+    },
+    {
+        "key": "_CheckAnswer_",
+        "value": "Check",
+        "description": "Text for Check answer button."
+    },
+    {
+        "key": "_Continue_",
+        "value": "Continue",
+        "description": "Text for Continue button."
+    },
+    {
+        "key": "_Language_",
+        "value": "Language",
+        "description": "Text for Languages labels"
+    },
+    {
+        "key": "_DeckProperties_",
+        "value": "Deck Properties",
+        "description": "Text for Deck Properties label"
+    },
+    {
+        "key": "_NameLabel_",
+        "value": "Name",
+        "description": "Text for Name labels"
+    },
+    {
+        "key": "_PracticeModesForLite_",
+        "value": "Practice modes available for VocabLift Lite",
+        "description": "Text for VocabLift Lite label"
+    },
+    {
+        "key": "_UpdateDeck_",
+        "value": "Update deck",
+        "description": "Text for Update deck label"
+    },
+    {
+        "key": "_Edit_",
+        "value": "Edit",
+        "description": "Text for Edit labels"
+    },
+    {
+        "key": "_DeckImportExportMenuText_",
+        "value": "Decks",
+        "description": "Text for Deck import/export menu label"
+    },
+    {
+        "key": "_CardFilterAllText_",
+        "value": "Search...",
+        "description": "Text for card filter all fields placeholder"
+    },
+    {
+        "key": "_Matching_",
+        "value": "Matching",
+        "description": "Text for Matching game."
+    },
+    {
+        "key": "_MatchCards_",
+        "value": "Match the pictures and words.",
+        "description": "Text for Match pairs."
+    },
+    {
+        "key": "_MemorySetup_",
+        "value": "Memory Setup",
+        "description": "Text for Max memory pairs per round."
+    },
+    {
+        "key": "_NumberOfPairsPerSet_",
+        "value": "Maxiumum numbers of pairs per round.",
+        "description": "Text for Max memory pairs per round."
+    },
+    {
+        "key": "_DDGame_",
+        "value": "Dirty Dozen",
+        "description": "Text for DDGame."
+    },
+    {
+        "key": "_NewDeck_",
+        "value": "New Deck",
+        "description": "Text for New Deck."
+    },
+    {
+        "key": "_ShowWords_",
+        "value": "Show Words",
+        "description": "Text for Show Words."
     }
 ]

@@ -1,12 +1,13 @@
-<div class="deck" ng-class="{activeDeck: deck.active}" droppable="true" ng-model="deck" dropAction="dropToDeck">
+<div  ng-class="{activeDeck: deck.active}" >
     <span class="deckExpander" ng-class="{open: deck.expanded, closed: !deck.expanded}"
           ng-click="deck.expanded = !deck.expanded"></span>
     <span><input type="checkbox" ng-model="deck.selected" ng-change="toggleDeck(deck)"/></span>
-    <span class="deckName" ng-click="$parent.setActiveDeck(deck)" contenteditable="true" ng-model="deck.name"></span>
+    <span class="deckName" ng-click="$parent.setActiveDeck(deck)" draggable="true" ng-model="deck">{{deck.name}}</span>
     <span class="deckRemover" ng-click="removeDeckConfirm(deck)"></span>
+    <span class="editDeckButton" ng-click="editDeck(deck)">{{'_Edit_' | i18n}}</span>
 
     <div class="deckData" ng-show="deck.expanded">
-        <div ng-repeat="deck in deck.subdecks" ng-include="'partials/deck.html'"></div>
-        <div ng-repeat="card in deck.cards" ng-include="'partials/card.html'"></div>
+        <div class="deck" ng-repeat="deck in deck.subdecks" droppable="true" ng-model="deck" dropAction="dropToDeck" ng-include="'partials/deck.html'"></div>
+        <div ng-repeat="card in deck.cards | cardListFilter:project.config.cardListFilter" ng-include="'partials/card.html'"></div>
     </div>
 </div>

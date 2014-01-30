@@ -47,7 +47,7 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
                         $scope.OpenProject();
                     }
                     global.project = null;
-                    this.close()
+                    this.close();
                 });
                 return false;
             }
@@ -348,12 +348,15 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
                     //$scope.Entries = $filter('filter')($scope.lift.entry, filterText);
                     var result = $scope.gridOptions.ngGrid.rowCache;
                     $scope.dictionaryFiltered = true;
-                    for (var field in filterText) {
+                    var combining = /[\u0300-\u036F]/g;
+					for (var field in filterText) {
                         var fName = field.substr(14);
+						var ft = filterText[field].toLowerCase().replace(combining, '');
+						ft = ft.replace(/ñ/g, "ñ").replace(/[ꞌꞋ]/g, "'");
                         result = $filter('filter')(result, function (item) {
                             if (item.entity.__columnMap__[fName]) {
-                                var combining = /[\u0300-\u036F]/g;
-                                if (UNorm.nfkd(item.entity.__columnMap__[fName]).toLowerCase().replace(combining, '').indexOf(UNorm.nfkd(filterText[field].toLowerCase().replace(combining, ''))) > -1) {
+                                var ct = UNorm.nfkd(item.entity.__columnMap__[fName].toLowerCase().replace(/ñ/g, "ñ").replace(combining, '').replace(/[ꞌꞋ]/g, "'"));
+                                if (ct.indexOf(ft) > -1) {
                                     return true;
                                 }
                             }
@@ -376,7 +379,7 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
                     //$scope.Entries = $scope.lift.entry;
                     $scope.dictionaryFiltered = false;
                 }
-            })
+            });
         }
         $scope.gridColumns = gCols;
     };
@@ -397,7 +400,8 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
         }
         $scope.project.dirty = true;
         if ($scope.project.config.autoSave) {
-            $scope.SaveProject();
+            ProjectServices.saveConfig();
+            $scope.project.dirty = false;
         }
     };
 
@@ -486,16 +490,16 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
                         };
                         if ($scope.project.config.autoAddMedia) {
                             if (glossCard.picture == "") {
-                                if (fs.existsSync($scope.project.liftObject.directory + $scope.project.config.picturePath + UNorm.nfkd(glossCard.side2).toLowerCase().replace(combining, "") + ".jpg")) {
-                                    glossCard.picture = UNorm.nfkd(glossCard.side2).toLowerCase().replace(combining, "") + ".jpg";
+                                if (fs.existsSync($scope.project.liftObject.directory + $scope.project.config.picturePath + UNorm.nfkd(glossCard.side2).toLowerCase().replace(/ñ/, "ñ").replace(combining, "") + ".jpg")) {
+                                    glossCard.picture = UNorm.nfkd(glossCard.side2).toLowerCase().replace(/ñ/, "ñ").replace(combining, "") + ".jpg";
                                 }
-                                else if (fs.existsSync($scope.project.liftObject.directory + $scope.project.config.picturePath + UNorm.nfkd(glossCard.side2).toLowerCase().replace(combining, "") + ".png")) {
-                                    glossCard.picture = UNorm.nfkd(glossCard.side2).toLowerCase().replace(combining, "") + ".png";
+                                else if (fs.existsSync($scope.project.liftObject.directory + $scope.project.config.picturePath + UNorm.nfkd(glossCard.side2).toLowerCase().replace(/ñ/, "ñ").replace(combining, "") + ".png")) {
+                                    glossCard.picture = UNorm.nfkd(glossCard.side2).toLowerCase().replace(/ñ/, "ñ").replace(combining, "") + ".png";
                                 }
                             }
                             if (glossCard.audio == "") {
-                                if (fs.existsSync($scope.project.liftObject.directory + $scope.project.config.audioInfo.path + UNorm.nfkd(glossCard.side2).toLowerCase().replace(combining, "") + ".wav")) {
-                                    glossCard.audio = UNorm.nfkd(glossCard.side2).toLowerCase().replace(combining, "") + ".wav";
+                                if (fs.existsSync($scope.project.liftObject.directory + $scope.project.config.audioInfo.path + UNorm.nfkd(glossCard.side2).toLowerCase().replace(/ñ/, "ñ").replace(combining, "") + ".wav")) {
+                                    glossCard.audio = UNorm.nfkd(glossCard.side2).toLowerCase().replace(/ñ/, "ñ").replace(combining, "") + ".wav";
                                 }
                             }
                         }
@@ -642,19 +646,24 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
         else {
             $scope.activeDeck = null;
         }
+        $scope.project.dirty = true;
+        if ($scope.project.config.autoSave) {
+            $scope.saveAllDecks();
+        }
         return false;
     };
 
     $scope.addDeck = function () {
+        var deckName = $filter('i18n')("_NewDeck_");
         if ($scope.activeDeck) {
-            $scope.activeDeck.subdecks.push({guid: GUID(), name: "New Deck", subdecks: new Array(), cards: new Array(), expanded: true});
+            $scope.activeDeck.subdecks.push({guid: GUID(), name: deckName, subdecks: new Array(), cards: new Array(), expanded: true});
         }
         else {
-            $scope.project.decks.push({guid: GUID(), name: "New Deck", subdecks: new Array(), cards: new Array(), expanded: true});
+            $scope.project.decks.push({guid: GUID(), name: deckName, subdecks: new Array(), cards: new Array(), expanded: true});
         }
         $scope.project.dirty = true;
         if ($scope.project.config.autoSave) {
-            $scope.SaveProject();
+            $scope.saveAllDecks();
         }
     };
 
@@ -672,10 +681,58 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
         return  $scope.selectedDecks;
     };
 
+    $scope.editorDeck = {guid: "", name: "", modes: []};
+    
+    $scope.editDeck = function (deck) {
+        $scope.editorDeck.guid = deck.guid;
+        $scope.editorDeck.name = deck.name;
+        if (deck.modes) {
+            $scope.editorDeck.modes = angular.copy(deck.modes);
+        }
+        else {
+            $scope.editorDeck.modes = [];
+        }
+        
+        var modesInDeck = [];
+        angular.forEach($scope.editorDeck.modes, function (mode) {
+            modesInDeck.push(mode.name); 
+        });
+        angular.forEach($scope.practiceModes, function(pMode) {
+            if (modesInDeck.indexOf(pMode.name) == -1) {
+                $scope.editorDeck.modes.push({name: pMode.name, available: true});
+            }
+        });
+        $scope.originalEditDeck = deck;
+        $scope.modal.showModal = true;
+        $scope.modal.showDeckEditor = true;
+    };
+    
+    $scope.updateEditedDeck = function () {
+        if ($scope.originalEditDeck.guid == $scope.editorDeck.guid) {
+            $scope. originalEditDeck.name = $scope.editorDeck.name;
+            $scope. originalEditDeck.modes = angular.copy($scope.editorDeck.modes);
+        }
+        $scope.modal.showDeckEditor = false;
+        $scope.modal.showModal = false;
+        $scope.project.dirty = true;
+        if ($scope.project.config.autoSave) {
+            $scope.saveAllDecks();
+        }
+    };
+    
+    $scope.closeDeckEditor = function () {
+        $scope.modal.showDeckEditor = false;
+        $scope.modal.showModal = false;
+        $scope.editorDeck = {guid: "", name: "", modes: []};
+    };
 
     $scope.toggleDeck = function (deck) {
         $scope.selectedDecks = [];
         getSelectedDecks($scope.project.decks);
+        $scope.project.dirty = true;
+        if ($scope.project.config.autoSave) {
+            $scope.saveAllDecks();
+        }
         /* var d = $filter('filter')($scope.selectedDecks, function (deck) {
          ife
          })[0];
@@ -747,7 +804,7 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
         }
         $scope.project.dirty = true;
         if ($scope.project.config.autoSave) {
-            $scope.SaveProject();
+            $scope.saveAllDecks();
         }
         $scope.modal.showModal = false;
         $scope.modal.showDeleteDeckAlert = false;
@@ -778,10 +835,26 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
             $scope.project.dirty = true;
         }
         if ($scope.project.config.autoSave) {
-            $scope.SaveProject();
+            $scope.saveAllDecks();
         }
     };
-
+    
+    function updateCopiedDeckCardGUIDs (deck) {
+        if (deck) {
+            if (deck.cards && deck.cards.length) {
+                angular.forEach(deck.cards, function (card) {
+                    card.guid = GUID(); 
+                });
+            }
+            if (deck.subdecks && deck.subdecks.length) {
+                angular.forEach(deck.subdecks, function (sD) {
+                    sD.guid = GUID(); 
+                    updateCopiedDeckCardGUIDs(sD);
+                });
+            }
+        }
+    }
+    
     $scope.dropToDeck = function (deck, model) {
         if (model.type == "entry") {
             var card = null;
@@ -790,9 +863,19 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
                 $scope.setCurrentCard(card);
             }
             else {
-                for (var i = 0; i < $scope.selectedEntries.length; i++) {
-                    card = $scope.cardFromEntry(deck, $scope.selectedEntries[i]);
+                var cardCheck = $filter('filter')($scope.selectedEntries, function (c) {
+                    if (c.guid == model.value.guid) {
+                        return true;
+                    }
+                });
+                if (!cardCheck.length) {
+                    card = $scope.cardFromEntry(deck, model.value); 
                 }
+                else {
+                    for (var i = 0; i < $scope.selectedEntries.length; i++) {
+                        card = $scope.cardFromEntry(deck, $scope.selectedEntries[i]);
+                    }
+                } 
                 $scope.setCurrentCard(card);
             }
             //$scope.project.dirty = true;
@@ -808,6 +891,50 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
                 $scope.setCurrentCard(card);
                 //$scope.project.dirty = true;
             }
+        }
+        else if (model.type == "deck") {
+            var parent = $scope.findDeckParent(deck, $scope.project.decks);
+            if (parent) {
+                var mIndex = -1;
+                angular.forEach(parent.subdecks, function (value, key) {
+                    if (value.guid == model.value.guid) {
+                        mIndex = key;
+                    }
+                });
+                var dIndex = parent.subdecks.indexOf(deck);
+                if (mIndex != -1) {
+                    parent.subdecks.move(mIndex, dIndex);
+                }
+                else {
+                    var d = angular.copy(model.value);
+                    d.guid = GUID();
+                    updateCopiedDeckCardGUIDs(d);
+                    parent.subdecks.splice(dIndex, 0, d);
+                } 
+            }
+            else {
+                var mIndex = -1;
+                angular.forEach($scope.project.decks, function (value, key) {
+                    if (value.guid == model.value.guid) {
+                        mIndex = key;
+                    }
+                });
+                var dIndex = $scope.project.decks.indexOf(deck);
+                if (mIndex != -1) {
+                    $scope.project.decks.move(mIndex, dIndex);
+                }
+                else {
+                    var d = angular.copy(model.value);
+                    d.guid = GUID();
+                    updateCopiedDeckCardGUIDs(d);
+                    $scope.project.decks.splice(dIndex, 0, d);
+                } 
+            }
+            
+        }
+        $scope.project.dirty = true;
+        if ($scope.project.config.autoSave) {
+            $scope.saveAllDecks();
         }
 
         /*if ($scope.project.dirty && $scope.project.config.autoSave) {
@@ -909,11 +1036,16 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
             global.currentSession = null;
             PracticeServices.saveSessionsToFile();
         }
+        if ($scope.practice.GameResize) {
+            $(window).off("resize", $scope.practice.GameResize);
+            $scope.practice.GameResize = null;
+        }
+        
         $scope.project.config.practiceMode = mode;
         $scope.practice.mode = mode;
         $scope.project.dirty = true;
         if ($scope.project.config.autoSave) {
-            $scope.SaveProject();
+            ProjectServices.saveConfig();
         }
     }
 
@@ -938,19 +1070,24 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
             global.currentSession = null;
             PracticeServices.saveSessionsToFile();
         }
+        if ($scope.practice.GameResize) {
+            $(window).off("resize", $scope.practice.GameResize);
+            $scope.practice.GameResize = null;
+        }
         $scope.project.config.practiceMode = $scope.practice.mode;
         $scope.practice.mode = null;
         if ($scope.project.config.autoSave) {
-            $scope.SaveProject();
+            ProjectServices.saveConfig();
+            $scope.project.dirty = false;
         }
     }
 
-    $scope.CompletePracticeSession = function () {
+    /*$scope.CompletePracticeSession = function () {
         $scope.practice.finish = true;
         if ($project.config.autoSave) {
             $scope.SaveProject();
         }
-    };
+    };*/
 
 
     $scope.EditConfiguration = function () {
@@ -989,7 +1126,8 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
                 $scope.$apply();
                 $scope.project.dirty = true;
                 if ($scope.project.config.autoSave) {
-                    $scope.SaveProject();
+                    ProjectServices.saveConfig();
+                    $scope.project.dirty =false;
                 }
                 global.project = null;
                 global.listColumns = null;
@@ -1042,7 +1180,8 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
     };
 
     $scope.saveAllDecks = function () {
-        DeckServices.saveDeck($scope.liftObject.liftPathNoExt + "deck", $scope.project.decks);
+        DeckServices.saveDeck($scope.project.liftObject.liftPathNoExt + "deck", $scope.project.decks);
+        $scope.project.dirty = false;
     };
 
     $scope.exportDecks = function () {
@@ -1053,6 +1192,7 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
                     path = path + ".deck";
                 }
                 DeckServices.saveDeck(path, $scope.selectedDecks);
+                $("#deckFileSaveDialog").val("");
             });
         }
     };
@@ -1072,6 +1212,10 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
                         for (var i = 0; i < decks.length; i++) {
                             $scope.project.decks.push(decks[i]);
                         }
+                    }
+                    $scope.project.dirty = true;
+                    if ($scope.project.config.autoSave) {
+                        $scope.saveAllDecks();
                     }
                     if (!$scope.$$phase && !$scope.$root.$$phase) {
                         $scope.$apply();
@@ -1133,7 +1277,8 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
             $scope.project.config.currentCard = $scope.currentCard.guid;
             $scope.project.dirty = true;
             if ($scope.project.config.autoSave) {
-                $scope.SaveProject();
+                ProjectServices.saveConfig();
+                $scope.project.dirty = false;
             }
         }
     }
@@ -1430,7 +1575,7 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
         $scope.audioEdit = $scope.currentCard.properties.audio;
         $scope.project.dirty = true;
         if ($scope.project.config.autoSave) {
-            $scope.SaveProject();
+            ProjectServices.saveConfig();
         }
         $(document).click();
     };
@@ -1473,7 +1618,7 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
             $scope.cardChanged = false;
             $scope.project.dirty = true;
             if ($scope.project.config.autoSave) {
-                $scope.SaveProject();
+                $scope.saveAllDecks();
             }
         }
         catch (e) {
@@ -1487,7 +1632,9 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
             if (path) {
                 try {
                     var fileName = path.substr(path.lastIndexOf("\\") + 1);
-                    if (path.substr(0, path.lastIndexOf("\\") + 1) != stripFilePath($scope.project.liftObject.directory) + $scope.project.config.picturePath) {
+					var dir = path = path.replace(/\\/g, "/");
+                    //if (dir != stripFilePath($scope.project.liftObject.directory).replace(/\\/g, "/") + $scope.project.config.picturePath) {
+                    if (path.substr(0, path.lastIndexOf("/") + 1) != stripFilePath($scope.project.liftObject.directory).replace(/\\/g, "/") + $scope.project.config.picturePath) {
                         fs.copy(path, stripFilePath($scope.project.liftObject.directory) + $scope.project.config.picturePath + fileName, function (err) {
                             if (err) console.log(err);
                             $scope.pictureList.push({path: fileName, display: fileName});
@@ -1524,7 +1671,8 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
             if (path) {
                 try {
                     var fileName = path.substr(path.lastIndexOf("\\") + 1);
-                    if (path.substr(0, path.lastIndexOf("\\") + 1) != stripFilePath($scope.project.liftObject.directory) + $scope.project.config.audioInfo.path) {
+                    path = path.replace(/\\/g, "/");
+                    if (path.substr(0, path.lastIndexOf("/") + 1) != stripFilePath($scope.project.liftObject.directory).replace(/\\/g, "/") + $scope.project.config.audioInfo.path) {
                         fs.copy(path, stripFilePath($scope.project.liftObject.directory) + $scope.project.config.audioInfo.path + fileName, function (err) {
                             if (err) console.log(err);
                             $scope.audioList.push({path: fileName, display: fileName});
@@ -1553,6 +1701,14 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
         //$scope.currentCard.properties.audio = "";
         $scope.cardChanged = true;
     };
+    
+    $scope.clearCardListFilter = function () {
+        $scope.project.config.cardListFilter = {
+            findAll: "",
+            side1: "",
+            side2: ""
+        };
+    }
 
     $scope.initializeProject = function () {
         $scope.projectInitialized = false;
@@ -1575,6 +1731,16 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
         $scope.modal.showSaveCardAlert = false;
         $scope.lift = $scope.project.liftObject.lift.value;
         $scope.listColumns = $scope.project.config.listViewTemplate.columns;
+        
+        $scope.practiceModes = [
+            {name: "_Association_", controller: "AssociationPractice"},
+            {name: "_DDGame_", controller: "DDPractice"},
+            {name: "_FlashCards_", controller: "FlashCardPractice"},
+            {name: "_Comprehension_", conroller: "ComprehensionPractice"},
+            {name: "_Matching_", conroller: "MatchingPractice"},
+            {name: "_Memory_", conroller: "MemoryPractice"},
+            {name: "_Spelling_", controller: "SpellingPractice"}
+        ];
 
         $scope.picturePath = $scope.project.config.picturePath;
 
@@ -1615,6 +1781,7 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
                     $scope.saveGridColumns(args);
                 }
                 $scope.projectInitialized = true;
+                $("#MainContainer").css({"visibility": "visible"});
             }
         });
         $scope.$on('ngGridEventSorted', function (event, sortInfo) {
@@ -1628,7 +1795,8 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
                 if ($scope.projectInitialized) {
                     $scope.project.dirty = true;
                     if ($scope.project.config.autoSave) {
-                        $scope.SaveProject();
+                        ProjectServices.saveConfig();
+                        $scope.project.dirty = false;
                     }
                 }
             }
@@ -1666,6 +1834,14 @@ function VocabLiftCtrl($scope, $filter, localize, ProjectServices, LiftServices,
             $scope.currentCard = $scope.project.decks[0].cards[0];
         }
         $scope.cardChanged = false;
+        
+        if (!$scope.project.config.cardListFilter) {
+            $scope.project.config.cardListFilter = {
+                findAll: "",
+                side1: "",
+                side2: ""
+            };
+        }
 
         $scope.newCardEntryMatch.selection = [];
         $scope.project.dirty = false;
@@ -1753,197 +1929,6 @@ function GridFilterCtrl($scope, $filter) {
 }
 
 GridFilterCtrl.$inject = ['$scope', '$filter'];
-
-
-function CardView($scope, $filter) {
-    //$scope.currentCard = $scope.$parent.currentCard;
-    //$scope.possibilities = $scope.possibleCards($scope.getEntry($scope.currentCard.entry), $scope.currentCard);
-    //ugly hack
-    //$scope.currentCard.properties = $filter('filter')($scope.possibilities, {sense: $scope.currentCard.properties.sense, side1: $scope.currentCard.properties.side1})[0];
-
-    $scope.$watch("currentCard", function (newValue, oldValue) {
-        var entry;
-        if ($scope.currentCard) {
-            if ($scope.currentCard.entry) {
-                $scope.possibilities = $scope.possibleCards($scope.getEntry($scope.currentCard.entry), $scope.currentCard);
-                var check = $filter('filter')($scope.possibilities, function (item) {
-                    if (item.sense == $scope.currentCard.properties.sense && item.side2 == $scope.currentCard.properties.side2) {
-                        return true;
-                    }
-                });
-                $scope.currentCard.properties = check[0];
-                if ($scope.currentCard.properties.variant) {
-                    $scope.entry = $scope.getEntryFromRef($scope.currentCard.properties.variant);
-                }
-                else {
-                    $scope.entry = $scope.getEntry($scope.currentCard.entry);
-                }
-            }
-            if ($scope.currentCard.properties) {
-                $scope.audioEdit = $scope.currentCard.properties.audio;
-                $scope.cardChanged = false;
-                $scope.side1Edit = $scope.currentCard.properties.side1;
-                $scope.side2Edit = $scope.currentCard.properties.side2;
-                $scope.pictureEdit = $scope.currentCard.properties.picture;
-            }
-            else {
-                $scope.audioEdit = "";
-                $scope.cardChanged = false;
-                $scope.side1Edit = "";
-                $scope.side2Edit = "";
-                $scope.pictureEdit = "";
-            }
-            $scope.pictureList = new Array();
-            $scope.audioList = new Array();
-
-            if ($scope.entry) {
-                var sense = $scope.getSense($scope.entry, $scope.currentCard.properties.sense);
-                if (sense && sense.illustration) {
-                    for (var i = 0; i < sense.illustration.length; i++) {
-                        var pic = {
-                            path: $scope.project.liftObject.directory + $scope.project.config.picturePath + sense.illustration[i].href,
-                            display: sense.illustration[i].href
-                        };
-                        $scope.pictureList.push(pic);
-                    }
-                }
-                if ($scope.currentCard.properties.picture) {
-                    var check = $filter('filter')($scope.pictureList, {path: $scope.currentCard.properties.picture});
-                    if (check < 1) {
-                        //var shortName = $scope.currentCard.properties.picture.substr($scope.currentCard.properties.picture.lastIndexOf("/") + 1);
-                        $scope.pictureList.push({path: $scope.currentCard.properties.picture, display: $scope.currentCard.properties.picture});
-                    }
-                }
-
-                $scope.audioList = $scope.getAudioSourcesForSelection(entry);
-                if ($scope.currentCard.properties.audio) {
-                    var check = $filter('filter')($scope.audioList, {path: $scope.currentCard.properties.audio});
-                    if (check < 1) {
-                        //var shortName = $scope.currentCard.properties.audio.substr($scope.currentCard.properties.audio.lastIndexOf("/") + 1);
-                        $scope.audioList.push({path: $scope.currentCard.properties.audio, display: $scope.currentCard.properties.audio});
-                    }
-                }
-            }
-        }
-        else {
-            $scope.audioEdit = "";
-            $scope.cardChanged = false;
-            $scope.side1Edit = "";
-            $scope.side2Edit = "";
-            $scope.pictureEdit = "";
-            $scope.pictureList = new Array();
-            $scope.audioList = new Array();
-        }
-    });
-
-    $scope.changeCard = function () {
-        $scope.side1Edit = $scope.currentCard.properties.side1;
-        $scope.side2Edit = $scope.currentCard.properties.side2;
-        $scope.pictureEdit = $scope.currentCard.properties.picture;
-        $scope.audioEdit = $scope.currentCard.properties.audio;
-        $scope.project.dirty = true;
-        if ($scope.project.config.autoSave) {
-            $scope.SaveProject();
-        }
-        $(document).click();
-    };
-
-    $scope.saveCard = function () {
-        try {
-            if ($scope.currentCard.properties.side1 != $scope.side1Edit || $scope.currentCard.properties.side2 != $scope.side2Edit) {
-                var oldCard = angular.copy($scope.currentCard.properties);
-                $scope.possibilities.push(oldCard);
-                $scope.currentCard.properties.type = "user-defined";
-                $scope.currentCard.properties.side1 = $scope.side1Edit;
-                $scope.currentCard.properties.side2 = $scope.side2Edit;
-            }
-            $scope.currentCard.properties.picture = $scope.pictureEdit;
-            $scope.currentCard.properties.audio = $scope.audioEdit;
-            $scope.cardChanged = false;
-            $scope.project.dirty = true;
-            if ($scope.project.config.autoSave) {
-                $scope.SaveProject();
-            }
-        }
-        catch (e) {
-            alert(e);
-        }
-    };
-
-    /*$scope.BrowsePicture = function () {
-     $scope.chooseFile("#pictureFileDialog", function (evt) {
-     var path = $(this).val();
-     if (path) {
-     try {
-     var fileName = path.substr(path.lastIndexOf("\\") + 1);
-     if (path.substr(0, path.lastIndexOf("\\")+1) != stripFilePath($scope.project.liftObject.directory) + $scope.project.config.picturePath) {
-     fs.copy(path, stripFilePath($scope.project.liftObject.directory) + $scope.project.config.picturePath + fileName, function(err){
-     if (err) console.log(err);
-     $scope.pictureList.push({path: fileName, display: fileName});
-     $scope.pictureEdit =  fileName;
-     $scope.cardChanged = true;
-     $scope.$apply();
-     });
-     }
-     else {
-     $scope.pictureList.push({path:  fileName, display: fileName});
-     $scope.pictureEdit = fileName;
-     $scope.cardChanged = true;
-     $scope.$apply();
-     }
-     }
-     catch (e) {
-     console.log(e);
-     }
-     }
-     });
-     };*/
-
-    $scope.removePicture = function (event) {
-        event.stopPropagation();
-        $scope.pictureEdit = "";
-        $scope.cardChanged = true;
-        //$scope.currentCard.properties.picture = "";
-    };
-
-    /*$scope.BrowseAudio = function () {
-     $scope.chooseFile("#audioFileDialog", function (evt) {
-     var path = $(this).val();
-     if (path) {
-     try {
-     var fileName = path.substr(path.lastIndexOf("\\" + 1));
-     if (path.substr(0, path.lastIndexOf("\\") + 1) != stripFilePath($scope.project.liftObject.directory) + $scope.project.config.audioInfo.path) {
-     fs.copy(path, fileName, function(err){
-     if (err) console.log(err);
-     $scope.audioList.push({path: fileName, display: fileName});
-     $scope.audioEdit = fileName;
-     $scope.cardChanged = true;
-     $scope.$apply();
-     });
-     }
-
-     $scope.audioList.push({path: fileName, display: fileName});
-     $scope.audioEdit = fileName;
-     $scope.cardChanged = true;
-     $scope.$apply();
-     }
-     catch (e) {
-     console.log(e);
-     }
-     }
-     });
-     };*/
-
-    $scope.removeAudio = function () {
-        $scope.audioEdit = "";
-        //$scope.currentCard.properties.audio = "";
-        $scope.cardChanged = true;
-    };
-
-
-}
-CardView.$inject = ['$scope', '$filter'];
-
 
 function CardListView($scope, $filter) {
     //$scope.possibilities = $scope.possibleCards($scope.getEntry($scope.card.entry), $scope.card);
@@ -2083,6 +2068,7 @@ function AssociationPractice($scope, $filter) {
     $scope.currentItemIndex = 0;
     $scope.currentSet;
     $scope.practice.started = false;
+    $scope.practice.finished = false;
     $scope.practiceSet;
 
     $scope.showGloss = true;
@@ -2109,6 +2095,9 @@ function AssociationPractice($scope, $filter) {
             $scope.currentSet = $scope.practiceSet[$scope.currentItemIndex];
             setTimeout($scope.playAudioWord, 700, "associationAudio");
         }
+        else {
+            $scope.practice.finished = true;
+        }
     };
 
     $scope.prevSet = function () {
@@ -2127,6 +2116,7 @@ function FlashCardPractice($scope, $filter, localize) {
     $scope.currentItemIndex = 0;
     $scope.currentSet;
     $scope.practice.started = false;
+    $scope.practice.finished = false;
     $scope.practiceSet;
     $scope.FlashCardTotal;
     $scope.showSide2First = false;
@@ -2168,6 +2158,9 @@ function FlashCardPractice($scope, $filter, localize) {
 
             setTimeout($scope.playAudioWord, 700, "flashCardAudio");
         }
+        else {
+            $scope.practice.finished = true;
+        }
     };
 
     $scope.prevSet = function () {
@@ -2190,13 +2183,18 @@ function ComprehensionPractice($scope, $filter, PracticeServices) {
 
 
     //$scope.practiceCopy = $scope.practiceCards.slice();
-    $scope.useSession = null;
+    
 
     global.unfinishedSessions = $filter('filter')(global.allSessions, {type: "Comprehension", sessionCompleted: false});
-
+    
     $scope.unfinishedSessions = global.unfinishedSessions;
+    $scope.useSession = [];
+    if ($scope.unfinishedSessions && $scope.unfinishedSessions.length) {
+        $scope.useSession.push($scope.unfinishedSessions[0]);
+    }
 
     $scope.practice.started = false;
+    $scope.practice.finished = false;
 
     $scope.showGloss = true;
 
@@ -2223,13 +2221,14 @@ function ComprehensionPractice($scope, $filter, PracticeServices) {
                     for (var j = 0; j < $scope.project.config.comprehensionOptions.setSize - 1; j++) {
                         var found = false;
                         var r;
-                        while (!found) {
+                        var c = 0;
+                        while (!found && c < practiceCopy.length) {
                             r = getRandom(0, practiceCopy.length - 1);
                             var t = practiceCopy.slice(r)[0];
                             if (set.item.properties.side1 !== t.properties.side1 || practiceCopy.length < 2) {
                                 found = true;
                             }
-
+                            c++;
                         }
 
                         set.group.push(practiceCopy.splice(r, 1)[0]);
@@ -2239,7 +2238,7 @@ function ComprehensionPractice($scope, $filter, PracticeServices) {
                         sessionId: $scope.currentSession.sessionId,
                         set: set,
                         attempts: new Array(),
-                        correct: false,
+                        correct: null,
                         dateCreated: $scope.currentSession.dateCreated,
                         dateModified: $scope.currentSession.dateModiefied
                     });
@@ -2277,7 +2276,7 @@ function ComprehensionPractice($scope, $filter, PracticeServices) {
             var audio = document.getElementById("wordAudio");
             audio.src = "";
             $scope.currentSession.currentItemIndex = $scope.currentSession.currentItemIndex - 1;
-            $scope.currentSet = $scope.currentSession.currentItemIndex[$scope.currentSession.currentItemIndex];
+            $scope.currentSet = $scope.currentSession.sessionData[$scope.currentSession.currentItemIndex];
             setTimeout($scope.playAudioWord, 700, "wordAudio");
         }
     };
@@ -2292,6 +2291,7 @@ function ComprehensionPractice($scope, $filter, PracticeServices) {
                 $scope.currentSession.completed = $scope.currentSession.completed + 1;
             }
             if ($scope.currentSet.attempts.length == $scope.project.config.comprehensionOptions.maxAttempts && !$scope.currentSet.correct) {
+                $scope.currentSet.correct = false;
                 $scope.currentSession.incorrect = $scope.currentSession.incorrect + 1;
                 $scope.currentSession.completed = $scope.currentSession.completed + 1;
             }
@@ -2299,6 +2299,7 @@ function ComprehensionPractice($scope, $filter, PracticeServices) {
             $scope.currentSession.dateModified = now.toISOString();
             if ($scope.currentSession.completed == $scope.currentSession.sessionData.length) {
                 $scope.currentSession.sessionCompleted = true;
+                $scope.practice.finished = true;
             }
         }
         else {
@@ -2323,12 +2324,18 @@ function ComprehensionPractice($scope, $filter, PracticeServices) {
     };
 
     $scope.deleteOldSession = function (session) {
-        PracticeServices.deleteSession(session[0].sessionId);
-        var s = $filter('filter')($scope.unfinishedSessions, {sessionId: session[0].sessionId});
-        if (s.length) {
-            $scope.unfinishedSessions.splice($scope.unfinishedSessions.indexOf(s[0]), 1)
+        angular.forEach(session, function(value) {
+            PracticeServices.deleteSession(value.sessionId);
+            var s = $filter('filter')($scope.unfinishedSessions, {sessionId: value.sessionId});
+            if (s.length) {
+                $scope.unfinishedSessions.splice($scope.unfinishedSessions.indexOf(s[0]), 1)
+            }
+        });
+        $scope.useSession = [];
+        if ($scope.unfinishedSessions && $scope.unfinishedSessions.length) {
+            $scope.useSession.push($scope.unfinishedSessions[0]);
         }
-        $scope.useSession = null;
+
         PracticeServices.saveSessionsToFile();
         /*$scope.project.dirty = true;
          if ($scope.project.config.autoSave) {
@@ -2338,15 +2345,499 @@ function ComprehensionPractice($scope, $filter, PracticeServices) {
 }
 ComprehensionPractice.$inject = ['$scope', '$filter', 'PracticeServices'];
 
+function Tile(card, type) {
+	this.card = card;
+	this.type = type;
+	this.flipped = false;	
+}
+
+Tile.prototype.flip = function () {
+	this.flipped = !this.flipped;
+}
+
+function MemoryPractice($scope, $filter, $timeout) {
+	$scope.resetMemory = function () {
+        $scope.practice.started = false;
+        $scope.showGloss = false;
+        var maxHeight = window.innerHeight * 0.75;
+        $scope.maxCards = Math.floor(maxHeight / 170) * 2;
+        $scope.practiceCopy = $scope.practiceCards.slice();
+        $scope.practiceCopy.shuffle();
+        $scope.message = "_ClickOnACard_";
+        
+        $scope.roundTimes = [];
+        $scope.totalTime = 0;
+    }
+    $scope.message = "_ClickOnACard_";
+	$scope.resetMemory();
+	var stop;
+	
+	$scope.makeGrid = function () {
+		$scope.practiceFinished = false;
+		var memoryDeck = [];
+		
+		if ($scope.practiceCopy.length) {
+			for (var i = 0; i < $scope.maxCards && i < $scope.project.config.memoryOptions.maxPairsPerRound && $scope.practiceCopy.length; i++) {
+				var card = $scope.practiceCopy.splice(0, 1)[0];
+				memoryDeck.push(new Tile(card, "word"));
+				memoryDeck.push(new Tile(card, "picture"));
+			}
+			$scope.unmatchedPairs = memoryDeck.length / 2;
+			memoryDeck.shuffle();
+			var gridDimension = Math.ceil(Math.sqrt(memoryDeck.length));
+			$scope.grid = [];
+			
+			for (var row = 0; row < gridDimension; row++) {
+				$scope.grid[row] = [];
+				for (var col = 0; col < gridDimension; col++) {
+					if (!memoryDeck.length) {
+						break;
+					}
+					$scope.grid[row][col] = memoryDeck.splice(0, 1)[0];
+				}
+				if (!memoryDeck.length) {
+					break;
+				}
+			}
+			$scope.message = "_ClickOnACard_";
+			$scope.timeElapsed = 0;	
+	
+			$scope.updateTimeElapsed = function () {
+				$scope.timeElapsed = $scope.timeElapsed + 1000;
+				stop = $timeout(function() {
+					$scope.updateTimeElapsed();
+				}, 1000);
+			};
+			$scope.updateTimeElapsed();
+		}
+        $scope.practice.started = true;
+	};
+	
+	$scope.flipTile = function (tile) {
+		var audio = document.getElementById("memoryAudio");
+		audio.src = "";
+		if (tile.card.properties.audio) {
+			audio.src = $scope.project.liftObject.directory + $scope.project.config.audioInfo.path + tile.card.properties.audio;
+			setTimeout($scope.playAudioWord, 700, "memoryAudio");
+		}
+		
+		
+		if (tile.flipped)	{
+			return;
+		}
+		
+		tile.flip();
+		
+		if (!$scope.firstPick || $scope.secondPick) {
+
+		  if ($scope.secondPick) {
+			$scope.firstPick.flip();
+			$scope.secondPick.flip();
+			$scope.firstPick = $scope.secondPick = undefined;
+		  }
+	
+		  $scope.firstPick = tile;
+		  $scope.message = "_ChooseAnotherCard_";
+	
+		} else {
+	
+		  if ($scope.firstPick.card.guid === tile.card.guid) {
+			$scope.unmatchedPairs--;
+			$scope.message = ($scope.unmatchedPairs > 0) ? "_GoodJob_" : "_YouWon_";
+            $scope.firstPick.matched = tile.matched = true;
+			$scope.firstPick = $scope.secondPick = undefined;
+		  } else {
+			$scope.secondPick = tile;
+			$scope.message = "_TryAgain_";
+		  }
+		}
+		if ($scope.unmatchedPairs === 0) {
+			$timeout.cancel(stop);
+			$scope.roundTimes.push($scope.timeElapsed);
+            $scope.totalTime = $scope.totalTime + $scope.timeElapsed;
+			$scope.practiceFinished = true;
+		}
+	};    
+}
+MemoryPractice.$inject = ['$scope', '$filter', '$timeout'];
+
+function mLine(src, x, y) {
+	this.src = src;
+    this.begin = {x: x, y: y};
+	this.end = {x: x, y: y};
+	this.moving = true;
+    this.attached = false;
+    this.incorrect = false;
+    this.target = null;
+    this.lineStyle = {
+        left: x + "px",
+        top: y + "px",
+        width: 0,
+        transform: ""
+    };
+    
+}
+
+function MatchingPractice($scope, $filter, $timeout) {
+    $scope.resetMatching = function () {
+        $scope.practice.started = false;
+        $scope.showGloss = false;
+        var maxHeight = window.innerHeight * 0.80;
+        $scope.maxCards = Math.floor(maxHeight / 125);
+        $scope.practiceCopy = $scope.practiceCards.slice();
+        $scope.roundTimes = [];
+        $scope.totalTime = 0;
+        $scope.lines = [];
+    };
+    $scope.resetMatching();
+    $scope.message = "_MatchCards_";
+	var stop;
+    
+    var resizing = false;
+    
+    $scope.practice.GameResize = function () {
+        if ($scope.practice.mode == "Matching" && !resizing && $scope.lines.length) {
+            resizing = true;
+            //$(".matchingLine").css({"webkitTransition": "all 0s"});
+            angular.forEach($scope.lines, function (line) {
+                if (line.target) {
+                    line.end.x = line.target.offsetParent.offsetLeft;
+                    line.end.y = line.target.offsetTop + line.target.offsetHeight / 5.25;
+                    line.lineStyle.width = Math.sqrt((line.begin.x-line.end.x)*(line.begin.x-line.end.x) + (line.begin.y-line.end.y)*(line.begin.y-line.end.y));
+                    line.lineStyle.transform = 'rotate(' + Math.atan2(line.end.y-line.begin.y, line.end.x-line.begin.x) * 180 / Math.PI + 'deg)';
+                }
+            });
+            if (!$scope.$$phase && !$scope.$root.$$phase) {
+                $scope.$apply();
+            }
+            resizing = false;
+        }
+    };
+    $(window).on("resize", $scope.practice.GameResize);
+	
+	$scope.makeGrid = function () {
+		$scope.practiceCopy.shuffle();
+        $scope.message = "_MatchCards_";
+
+        $scope.practiceFinished = false;
+		$scope.matchingLeft = [];
+        $scope.matchingRight = [];
+		
+		if ($scope.practiceCopy.length) {
+			for (var i = 0; i < $scope.maxCards && $scope.practiceCopy.length; i++) {
+				var card = $scope.practiceCopy.splice(0, 1)[0];
+				$scope.matchingLeft.push({card: card, matched: false});
+				$scope.matchingRight.push({card: card, matched: false});
+			}
+			$scope.unmatchedPairs = $scope.matchingLeft.length;
+			$scope.matchingLeft.shuffle();
+            $scope.matchingRight.shuffle();
+            
+            $scope.lines = [];
+            $scope.currentLine = null;
+			
+			$scope.message = "_MatchCards_";
+			$scope.timeElapsed = 0;	
+	
+			$scope.updateTimeElapsed = function () {
+				$scope.timeElapsed = $scope.timeElapsed + 1000;
+				stop = $timeout(function() {
+					$scope.updateTimeElapsed();
+				}, 1000);
+			};
+			$scope.updateTimeElapsed();
+		}
+        $scope.practice.started = true;
+	};
+	
+	$scope.startLine = function (src, event) {
+		if (src.matched)	{
+			return;
+		}
+		
+		$scope.lines.push(new mLine(src, event.currentTarget.offsetParent.offsetWidth, event.currentTarget.offsetTop + event.currentTarget.offsetHeight / 2));
+        $scope.currentLine = $scope.lines[$scope.lines.length - 1];
+        $("#MatchingGrid").bind("mousemove", function (event) {
+            var practiceWindow = $("#PracticeWindow")[0];
+            $scope.currentLine.end.x = event.pageX - this.offsetLeft - practiceWindow.offsetLeft;
+            $scope.currentLine.end.y = event.pageY - this.offsetTop - 24 - practiceWindow.offsetTop;
+            $scope.currentLine.lineStyle.width = Math.sqrt(($scope.currentLine.begin.x-$scope.currentLine.end.x)*($scope.currentLine.begin.x-$scope.currentLine.end.x) + ($scope.currentLine.begin.y-$scope.currentLine.end.y)*($scope.currentLine.begin.y-$scope.currentLine.end.y));
+            $scope.currentLine.lineStyle.transform = 'rotate(' + Math.atan2($scope.currentLine.end.y-$scope.currentLine.begin.y, $scope.currentLine.end.x-$scope.currentLine.begin.x) * 180 / Math.PI + 'deg)';
+            if (!$scope.$$phase && !$scope.$root.$$phase) {
+                $scope.$apply();
+            }
+        });
+    };
+    
+	$scope.finishLine = function (dest, event) {
+        if (!$scope.currentLine || dest.matched)	{
+			return;
+		}
+        
+        $("#MatchingGrid").unbind("mousemove");
+        
+        
+        $scope.currentLine.end.x = event.currentTarget.offsetParent.offsetLeft;
+        $scope.currentLine.end.y = event.currentTarget.offsetTop + event.currentTarget.offsetHeight / 5.25;
+        $scope.currentLine.target = event.currentTarget;
+        $scope.currentLine.lineStyle.width = Math.sqrt(($scope.currentLine.begin.x-$scope.currentLine.end.x)*($scope.currentLine.begin.x-$scope.currentLine.end.x) + ($scope.currentLine.begin.y-$scope.currentLine.end.y)*($scope.currentLine.begin.y-$scope.currentLine.end.y));
+        $scope.currentLine.lineStyle.transform = 'rotate(' + Math.atan2($scope.currentLine.end.y-$scope.currentLine.begin.y, $scope.currentLine.end.x-$scope.currentLine.begin.x) * 180 / Math.PI + 'deg)';
+        $scope.currentLine.attached = true;
+        
+        if (dest.card.guid != $scope.currentLine.src.card.guid) {
+            $scope.currentLine.incorrect = true;
+        }
+        else {
+            $scope.currentLine.src.matched = true;
+            $scope.unmatchedPairs--;
+            dest.matched = true;
+        }
+        
+        $scope.currentLine = null;
+        
+        var audio = document.getElementById("matchingAudio");
+		audio.src = "";
+		if (dest.card.properties.audio) {
+			audio.src = $scope.project.liftObject.directory + $scope.project.config.audioInfo.path + dest.card.properties.audio;
+			setTimeout($scope.playAudioWord, 700, "matchingAudio");
+		}
+		
+		if ($scope.unmatchedPairs === 0) {
+			$timeout.cancel(stop);
+			$scope.roundTimes.push($scope.timeElapsed);
+            $scope.totalTime = $scope.totalTime + $scope.timeElapsed;
+			$scope.practiceFinished = true;
+		}
+	};    
+}
+MatchingPractice.$inject = ['$scope', '$filter', '$timeout'];
+
+function ddTile(card, index) {
+	this.card = card;
+	this.index = index;
+    this.style = {transform: "translate(0, 0)"};
+}
+
+function DDPractice($scope) {
+    $scope.practice.started = false;
+    $scope.resetDD = function () {
+        $scope.practice.started = false;
+        $scope.practiceCopy = $scope.practiceCards.slice();
+        $scope.practiceCopy.shuffle();
+    };
+    $scope.resetDD();
+    
+    var resizing = false;
+    
+    $scope.practice.GameResize = function () {
+        if ($scope.practice.mode == "DDGame" && !resizing && $scope.grid.length > 1) {
+            var dt = $("#DDGrid").css({"visibility": "hidden"});
+            var t = $(".ddTile").css({"webkitTransition": "all 0s"});
+            resizing = true;
+            for (var i = 0; i < $scope.grid.length; i++) {
+                var r = $scope.grid[i].index + 1;
+                var iTile = $(".ddTile:nth-child(" + (i + 1) + ")");
+                var rTile = $(".ddTile:nth-child(" + r + ")");
+                var x = rTile[0].offsetLeft - iTile[0].offsetLeft;
+                var y = rTile[0].offsetTop - iTile[0].offsetTop;
+                //$scope.grid[i].style.transform = 'translate(' + x + 'px, ' + y + 'px';
+                iTile.css({"webkitTransform": 'translate(' + x + 'px, ' + y + 'px'});
+            }
+            t.css({"webkitTransition": "all 0s"});
+            dt.css({"visibility": "visible"});
+            resizing = false;
+        }
+    };
+    $(window).on("resize", $scope.practice.GameResize);
+    
+    $scope.showWord = false;
+    
+	$scope.makeGroup = function () {
+        
+        $scope.practice.started = true;
+        $scope.group = [];
+        $scope.grid = [];
+        if (!$scope.$$phase && !$scope.$root.$$phase) {
+            $scope.$apply();
+        }
+        $scope.practiceFinished = false;
+		
+		if ($scope.practiceCopy.length) {
+			for (var i = 0; i < 12 && $scope.practiceCopy.length; i++) {
+				var card = $scope.practiceCopy.splice(0, 1)[0];
+				$scope.group.push(card);
+			}
+			$scope.addTile();
+		}
+        else {
+            $scope.practiceFinished = true;
+        }
+        
+	};
+	
+    $scope.addTile = function () {
+        if ($scope.group.length) {
+            //$(".ddTile").css({"webkitTransition": "-webkit-transform 0s"});
+            var newTile = new ddTile($scope.group.splice(0, 1)[0], $scope.grid.length);
+            $scope.grid.push(newTile);
+            $scope.currentTile = $scope.grid[$scope.grid.length - 1];
+            /*window.setTimeout(function () {
+                if ($scope.grid.length > 1) {
+                    for (var i = 0; i < $scope.grid.length; i++) {
+                        var r = $scope.grid[i].index + 1;
+                        var iTile = $(".ddTile:nth-child(" + (i + 1) + ")");
+                        var rTile = $(".ddTile:nth-child(" + r + ")");
+                        var x = rTile[0].offsetLeft - iTile[0].offsetLeft;
+                        var y = rTile[0].offsetTop - iTile[0].offsetTop;
+                        $scope.grid[i].style.transform = 'translate(' + x + 'px, ' + y + 'px';
+                    }
+                }
+            }, 10);*/
+            $(".ddTile").css({"webkitTransition": "all .6s"});
+            $scope.wasPreviousTileCount = 0;
+            $scope.prevousTile = $scope.grid.length - 1;
+            var audio = document.getElementById("DDAudio");
+            audio.src = "";
+            if ($scope.currentTile.card.properties.audio) {
+                audio.src = $scope.project.liftObject.directory + '/' + $scope.project.config.audioInfo.path + $scope.currentTile.card.properties.audio;
+                setTimeout($scope.playAudioWord, 700, "DDAudio");
+            }
+        }
+        else {
+            $(".ddTile").css({"webkitTransition": "all 0s"});
+            $("#DDGrid").css({"visibility": "hidden"});
+            window.setTimeout(function() {
+                $scope.makeGroup();
+                //window.setTimeout(function() {
+                    $("#DDGrid").css({"visibility": "visible"});
+                //}, 1);
+            }, 1);
+            
+        }
+    };
+    
+    $scope.shuffleTiles = function () {
+        $(".ddTile").css({"webkitTransition": "all .6s"});
+        if ($scope.grid.length > 1) {
+            var t = [];
+            for (var i = 0; i < $scope.grid.length; i++) {
+                var r = Math.floor(Math.random() * $scope.grid.length);
+                while (t.indexOf(r) != -1) {
+                    r = Math.floor(Math.random() * $scope.grid.length);
+                }
+                t.push(r);
+                r = parseInt(r);
+                var iTile = $(".ddTile:nth-child(" + (i + 1) + ")");
+                var rTile = $(".ddTile:nth-child(" + (r + 1) + ")");
+                var x = rTile[0].offsetLeft - iTile[0].offsetLeft;
+                var y = rTile[0].offsetTop - iTile[0].offsetTop;
+                $scope.grid[i].index = r;
+                $scope.grid[i].style.transform = 'translate(' + x + 'px, ' + y + 'px';
+            }
+        }
+        else {
+            var audio = document.getElementById("DDAudio");
+            audio.src = "";
+            if ($scope.currentTile.card.properties.audio) {
+                audio.src = $scope.project.liftObject.directory + '/' + $scope.project.config.audioInfo.path + $scope.currentTile.card.properties.audio;
+                setTimeout($scope.playAudioWord, 700, "DDAudio");
+            }
+        }
+    };
+    
+    $scope.currentCorrectAttempts = 0;
+    
+    $scope.chooseRandomTile = function () {
+        if ($scope.grid.length > 1) {
+            var r = Math.floor(Math.random() * $scope.grid.length);
+            
+            while ($scope.prevousTile == r && $scope.previousTileCount > 3) {
+                r = Math.floor(Math.random() * $scope.grid.length);
+            }
+            $scope.currentTile = $scope.grid[r];
+            if ($scope.prevousTile == r) {
+                $scope.wasPreviousTileCount++;
+            }
+            else {
+                $scope.prevousTile = r;
+                $scope.previousTileCount = 0;
+            }
+        }
+        var audio = document.getElementById("DDAudio");
+        audio.src = "";
+        if ($scope.currentTile.card.properties.audio) {
+            audio.src = $scope.project.liftObject.directory + '/' + $scope.project.config.audioInfo.path + $scope.currentTile.card.properties.audio;
+            setTimeout($scope.playAudioWord, 700, "DDAudio");
+        }
+    };
+    $scope.attemptedTile = "";
+    $scope.correctTile = "";
+    $scope.attempt = function (tile) {
+        $scope.correctTile = $scope.currentTile.card.guid;
+        $scope.attemptedTile = tile.card.guid;
+
+        window.setTimeout(function () {
+            $scope.attemptedTile = "";
+            if (!$scope.$$phase && !$scope.$root.$$phase) {
+                $scope.$apply();
+            }
+        }, 700);
+        
+        if ($scope.currentTile.card.guid == tile.card.guid) {
+            $scope.currentCorrectAttempts++;
+            if (($scope.grid.length > 4 && $scope.currentCorrectAttempts > 7) || ($scope.grid.length <  5 && $scope.currentCorrectAttempts > 6) || ($scope.grid.length <  2 && $scope.currentCorrectAttempts > 2)) {
+                $scope.addTile();
+                $scope.currentCorrectAttempts = 0;
+                return;
+            }
+            else if ($scope.currentCorrectAttempts > 1 && $scope.grid.length > 1) {
+                var r = Math.random() < 0.49 ? true : false;
+                if (r) {
+                    $scope.shuffleTiles();
+                }
+                $scope.chooseRandomTile();
+            }
+            else {
+                $scope.previousTileCount++;
+                if ($scope.currentTile.card.properties.audio) {
+                    setTimeout($scope.playAudioWord, 700, "DDAudio");
+                }
+            }
+        }
+        else {
+            if ($scope.currentTile.card.properties.audio) {
+                setTimeout($scope.playAudioWord, 700, "DDAudio");
+            }
+        } 
+    };
+    
+    /*$scope.$watch('currentTile', function () {
+        if ($scope.currentTile) {
+            var audio = document.getElementById("DDAudio");
+            audio.src = "";
+            if ($scope.currentTile.card.properties.audio) {
+                audio.src = $scope.project.directory + '/' + $scope.project.config.audioInfo.path + $scope.currentTile.card.properties.audio;
+                setTimeout($scope.playAudioWord, 700, "DDAudio");
+            }
+        }
+    });*/
+
+}
+DDPractice.$inject = ['$scope'];
+
 function SpellingPractice($scope, $filter, PracticeServices) {
-    $scope.useSession = null;
 
     global.unfinishedSessions = $filter('filter')(global.allSessions, {type: "Spelling", sessionCompleted: false});
-
+    
     $scope.unfinishedSessions = global.unfinishedSessions;
+    $scope.useSession = [];
+    if ($scope.unfinishedSessions && $scope.unfinishedSessions.length) {
+        $scope.useSession.push($scope.unfinishedSessions[0]);
+    }
 
     $scope.answer = "";
     $scope.practice.started = false;
+    $scope.practice.finished = false;
     $scope.practiceSet;
 
 
@@ -2410,7 +2901,7 @@ function SpellingPractice($scope, $filter, PracticeServices) {
             var audio = document.getElementById("spellingAudio");
             audio.src = "";
             $scope.currentSession.currentItemIndex = $scope.currentSession.currentItemIndex - 1;
-            $scope.currentSet = $scope.currentSession.currentItemIndex[$scope.currentSession.currentItemIndex];
+            $scope.currentSet = $scope.currentSession.sessionData[$scope.currentSession.currentItemIndex];
             setTimeout($scope.playAudioWord, 700, "spellingAudio");
         }
     };
@@ -2421,7 +2912,7 @@ function SpellingPractice($scope, $filter, PracticeServices) {
             $scope.currentSet.attempts.push($scope.answer);
 
             if ($scope.project.config.spellingOptions.checkDiacritics) {
-                if (UNorm.nfkd($scope.answer).toLowerCase() === UNorm.nfkd($scope.currentSet.set.item.properties.side1).toLowerCase()) {
+                if (UNorm.nfkd($scope.answer).toLowerCase().replace(/ñ/, "ñ").replace(/[ꞌꞋ]/g, "'") === UNorm.nfkd($scope.currentSet.set.item.properties.side1).toLowerCase().replace(/ñ/, "ñ").replace(/[ꞌꞋ]/g, "'")) {
                     $scope.currentSet.correct = true;
                     $scope.currentSession.correct = $scope.currentSession.correct + 1;
                     $scope.currentSession.completed = $scope.currentSession.completed + 1;
@@ -2429,7 +2920,7 @@ function SpellingPractice($scope, $filter, PracticeServices) {
             }
             else {
                 var combining = /[\u0300-\u036F]/g;
-                if (UNorm.nfkd($scope.answer).toLowerCase().replace(combining, '') === UNorm.nfkd($scope.currentSet.set.item.properties.side1).toLowerCase().replace(combining, '')) {
+                if (UNorm.nfkd($scope.answer).toLowerCase().replace(/ñ/, "ñ").replace(combining, '') === UNorm.nfkd($scope.currentSet.set.item.properties.side1).toLowerCase().replace(/ñ/, "ñ").replace(combining, '')) {
                     $scope.currentSet.correct = true;
                     $scope.currentSession.correct = $scope.currentSession.correct + 1;
                     $scope.currentSession.completed = $scope.currentSession.completed + 1;
@@ -2444,6 +2935,7 @@ function SpellingPractice($scope, $filter, PracticeServices) {
             $scope.currentSession.dateModified = now.toISOString();
             if ($scope.currentSession.completed == $scope.currentSession.sessionData.length) {
                 $scope.currentSession.sessionCompleted = true;
+                $scope.practice.finished = true;
             }
         }
         else {
@@ -2452,12 +2944,18 @@ function SpellingPractice($scope, $filter, PracticeServices) {
     }
 
     $scope.deleteOldSession = function (session) {
-        PracticeServices.deleteSession(session[0].sessionId);
-        var s = $filter('filter')($scope.unfinishedSessions, {sessionId: session[0].sessionId});
-        if (s.length) {
-            $scope.unfinishedSessions.splice($scope.unfinishedSessions.indexOf(s[0]), 1)
+        angular.forEach(session, function(value) {
+            PracticeServices.deleteSession(value.sessionId);
+            var s = $filter('filter')($scope.unfinishedSessions, {sessionId: value.sessionId});
+            if (s.length) {
+                $scope.unfinishedSessions.splice($scope.unfinishedSessions.indexOf(s[0]), 1)
+            }
+        });
+        $scope.useSession = [];
+        if ($scope.unfinishedSessions && $scope.unfinishedSessions.length) {
+            $scope.useSession.push($scope.unfinishedSessions[0]);
         }
-        $scope.useSession = null;
+
         PracticeServices.saveSessionsToFile();
         /*$scope.project.dirty = true;
          if ($scope.project.config.autoSave) {

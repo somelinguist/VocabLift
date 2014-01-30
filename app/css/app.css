@@ -51,6 +51,10 @@ html, body, #MainContainer {
     padding: 0;
 }
 
+#MainContainer {
+    visibility: hidden;  
+}
+
 #MainSubContainer {
     position: relative;
     top: 0px;
@@ -65,8 +69,8 @@ html, body, #MainContainer {
 .panelContainer {
     position: absolute;
     top: 3px;
-    bottom: 3px;
-    right: 3px;
+    bottom: 0px;
+    right: 0px;
     left: 3px;
 }
 
@@ -125,8 +129,11 @@ html, body, #MainContainer {
     min-width: 95%;
     padding: 4px 0;
     position: absolute;
-    top: 100%;
     z-index: 10000;
+}
+
+#LiftDictionary .dropdown-detail {
+    top: 100%;
 }
 
 .dropdown.open .dropdown-detail {
@@ -167,12 +174,113 @@ td.label {
     top: 0px;
     width: 50%;
     min-width: 100px;
-    height: 99%;
+    height: 100%%;
     overflow: auto;
 }
 
-.deck {
+#DeckImportExport {
+    display: inline-block;
+}
 
+#DeckImportExport #DeckImportExportMenu {
+    display: none;
+    border: 1px solid lightgray;
+    list-style-type: none;
+    margin: 0;
+	padding: 0;
+    position: absolute;
+}
+
+#DeckImportExport:hover #DeckImportExportMenu {
+    display: block;
+}
+
+#DeckImportExport #DeckImportExportMenu li {
+    padding: 2px 7px;
+    color: dimgray;
+    font-size: 10px;
+}
+
+#DeckImportExport #DeckImportExportMenu li:hover {
+    background-color: steelblue;
+    color: white;
+}
+
+#CardSearchBox {
+    display: inline-block;
+    position: relative;
+}
+
+#CardSearchAllBox > input {
+    height: 18px;
+    width: 150px;
+}
+
+#CardSearchClear {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    top: 4px;
+    right: 22px;
+    background-image: url("../icons/onebit/onebit-33.png");
+    background-size: 16px 16px;
+}
+
+#CardSearchAdvanced {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#CardSearchAdvancedToggle {
+    width: 16px;
+    height: 16px;
+    margin: 5px;
+    margin-top: 4px;
+    background-image: url("../icons/onebit/onebit-39.png");
+    background-size: 16px 16px;
+}
+
+#CardSearchAdvancedBox {
+    display: none;
+    position: absolute;
+    right: 0;
+    margin-top: -2px;
+    background-color: white;
+    z-index: 500;
+}
+
+#CardSearchAdvancedBox ul {
+    border: 1px solid lightgray;
+    list-style-type: none;
+    margin: 0;
+	padding: 5px 0px;
+}
+
+#CardSearchAdvanced:hover #CardSearchAdvancedBox {
+    display: block;
+}
+
+#CardSearchAdvancedBox li {
+    padding: 3px 7px;
+}
+
+#CardSearchAdvancedBox input {
+    width: 161px;
+}
+.deck {
+    margin-left: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+
+.deck.dropBeforeZone {
+    border-top: 2px solid black;
+}
+
+.deck.dropBeforeZone * {
+    pointer-events: none;
 }
 
 .deck.dropZone {
@@ -188,6 +296,17 @@ td.label {
     height: 16px;
     display: inline-block;
     float: right;
+}
+
+.deck .editDeckButton {
+    display: none;
+    font-style: italic;
+    cursor: pointer;
+}
+.deck:hover .editDeckButton {
+    display: inline-block;
+    float: right;
+    margin-right: 5px;
 }
 
 .deckExpander {
@@ -206,7 +325,7 @@ td.label {
 }
 
 .activeDeck > .deckName {
-    background-color: blue;
+    background-color: steelblue;
     color: white;
 }
 
@@ -240,44 +359,60 @@ td.label {
 #CardView {
     height: 35%;
     border-bottom: 1px solid lightgray;
-    overflow: auto;
     padding-left: 10px;
+}
+
+.cardViewEdit {
+    height: 100%;
 }
 
 .cardHeader, .cardFooter {
     position: relative;
 }
 
-.cardHeader .cardPicture {
+.cardHeader {
+    height: 30%;
+    left: 0;
+    margin-right: 128px;
+    overflow: auto;
+}
+
+.cardHeader .cardTools {
+    right: 0px;
+    top: 0px;
+    position: absolute;
+}
+
+.cardViewEdit .cardPicture {
     position: absolute;
     top: 2px;
-    right: 2px;
+    right: 3px;
     width: 120px;
     height: 120px;
     border: 1px solid black;
 }
 
-.cardHeader .cardPicture img {
+.cardViewEdit .cardPicture img {
     width: 120px;
     height: 120px;
 }
 
-.cardHeader .cardPicture .cardPictureOverlay {
+.cardViewEdit .cardPicture .cardPictureOverlay {
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
     width: 100%;
     height: 100%;
 }
 
-.cardHeader .cardPicture .cardPictureOverlay div {
+.cardViewEdit .cardPicture .cardPictureOverlay div {
     margin: auto;
 }
 
-.cardHeader .cardPicture #PictureRemoverPicture {
+.cardViewEdit .cardPicture #PictureRemoverPicture {
     display: none;
 }
 
-.cardHeader .cardPicture:hover #PictureRemoverPicture {
+.cardViewEdit .cardPicture:hover #PictureRemoverPicture {
     background-image: url("../icons/onebit/onebit-33.png");
     background-size: 16px 16px;
     width: 16px;
@@ -302,7 +437,7 @@ td.label {
 
 .cardHeadword {
     display: inline-block;
-    width: 30%;
+    width: 55%;
     font-weight: bold;
 }
 
@@ -332,22 +467,25 @@ td.label {
 }
 
 .cardViewEdit .cardFields {
-    width: 100%;
+    left: 0;
+    padding-right: 128px;
 }
 
 .cardViewEdit .cardField {
     width: 100%;
+    height: 24px;
+    white-space: nowrap;
 }
 
 .cardField div.label {
     float: left;
     width: 15%;
+    white-space: nowrap;
 }
 
 .cardField div.cardData {
     display: inline-block;
-    width: 50%;
-    overflow: hidden;
+    width: 85%;
 }
 
 .cardField div.cardData input {
@@ -355,11 +493,11 @@ td.label {
 }
 
 .cardField div.cardData select {
-    width: 87%;
+    width: 70%;
 }
 
 .cardField div.cardData button {
-    width: 11%;
+    width: 30px;
 }
 
 .cardEdit span.label {
@@ -375,22 +513,29 @@ td.label {
     width: 49%;
 }
 
+.cardFooter .dropdown-toggle, .cardFooter .showCardStatistics {
+    display: inline-block;
+}
+
 #Decks {
     margin-top: 5px;
-    height: 62.5%;
+    height: 64%;
+    width: 100%;
+    display: table;
 }
 
 #DeckToolbar {
     height: 35px;
     margin-left: 10px;
+    display: table-row;
 }
 
 #DeckList {
-    height: 94%;
+    height: 100%;
     overflow-y: auto;
 }
 
-#DeckListContainer {
+.deck {
     margin-left: 10px;
 }
 
@@ -555,7 +700,7 @@ td.label {
     height: 100%;
 }
 
-#NewCardWindow {
+#NewCardWindow, #DeckPropertiesEditor {
     background-color: #ffffff;
     opacity: 1.0;
     position: absolute;
@@ -568,7 +713,7 @@ td.label {
     overflow: auto;
 }
 
-#NewCardWindowContainer {
+#NewCardWindowContainer, #DeckPropertiesContainer {
     padding: 15px;
     padding-top: 0px;
     width: 95%;
@@ -588,6 +733,10 @@ td.label {
 #NewCardCheckEntries select {
     width: 80%;
     height: 80%;
+}
+
+.editDeckModes {
+    list-style-type: none;
 }
 
 #SaveCardAlert, #DeleteDeckAlert {
@@ -668,6 +817,30 @@ td.label {
     max-width: 70%;
 }
 
+.practiceFinished {
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	background-color: white;
+	text-align: center;
+    z-index: 20;
+}
+
+.practiceFinishedContainer {
+	 margin-top: 50px;
+    margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 70%;	
+	font-size: 28px;
+}
+
+.practiceFinishedContainer ul {
+    list-style-type: none;
+}
+
 #AssociationWord {
     margin-left: auto;
     margin-right: auto;
@@ -719,17 +892,19 @@ td.label {
     text-align: center;
     width: 400px;
     border: 1px solid black;
-    height: 200px;
+    min-height: 200px;
+    max-height: 400px;
     position: relative;
+    -webkit-user-select: none;
 }
 
 #FlashCardArea .flashCard {
     margin-left: auto;
     margin-right: auto;
     padding-top: 65px;
-    overflow-y: auto;
     width: 400px;
-    height: 135px;
+    min-height: 135px;
+    max-height: 350px;
     text-align: center;
     background-color: white;
     font-size: 48px;
@@ -816,7 +991,7 @@ td.label {
     position: absolute;
     left: 0px;
     bottom: 0px;
-    height: 24px;
+    min-height: 24px;
     line-height: 24px;
     width: 200px;
     text-align: center;
@@ -839,6 +1014,299 @@ td.label {
 }
 
 .comprehensionCard .answer.incorrect {
+    background-image: url("../icons/onebit/onebit-33.png");
+}
+
+#MemoryGame {
+	width: 100%;
+	height:	100%;
+}
+
+#MemoryInfo {
+	width: 100%;
+	text-align: center;
+}
+
+#MemoryInfo span:first-child {
+	display: inline-block;
+	float: left;
+}
+
+#MemoryInfo span:last-child {
+	display: inline-block;
+	float: right;
+}
+
+#MemoryGrid {
+	margin-left: auto;
+	margin-right: auto;
+	border-spacing: 10px;
+}
+
+#MemoryGrid .container {
+  width: 150px;
+  height: 150px;
+  position: relative;
+  -webkit-perspective: 800px;
+}
+
+#MemoryGrid .card {
+  width: 100%;
+  height: 100%;
+  -webkit-transition: -webkit-transform .6s;
+  -webkit-transform-style: preserve-3d;
+	border: 1px solid black;
+}
+
+#MemoryGrid .card.flipped {
+  -webkit-transform: rotateY( 180deg );
+}
+
+#MemoryGrid .card img, #MemoryGrid .card .wordLabel, #MemoryGrid .card .glossLabel {
+  -webkit-backface-visibility: hidden;
+}
+
+#MemoryGrid .card img {
+  display: block;
+  height: 100%;
+  width: 100%;
+  position: absolute;	
+}
+
+#MemoryGrid .card .wordLabel {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0px;
+	width: 100%;
+	height: 45px;
+	margin: auto;
+	font-family: "Charis SIL AmArea";
+	font-size: 18pt;
+	text-align: center;
+	margin: auto;
+}
+
+#MemoryGrid .card .glossLabel {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    min-height: 24px;
+    line-height: 24px;
+    width: 100%;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+}
+
+#MemoryGrid .card.matched {
+	opacity: 0.50;
+}
+
+#MemoryGrid .card.matched:hover {
+	opacity: 1.0;
+}
+
+#MemoryGrid .card .front {
+	background-color: black
+}
+
+#MemoryGrid .card .front img {
+	position: absolute;
+	background-color: steelblue;
+}
+
+
+#MemoryGrid .card .back {
+  -webkit-transform: rotateY( 180deg );
+}
+
+#MemoryMessage {
+  	width: 100%;
+  	text-align: center;
+	font-size: 30px;
+	font-weight: bold;
+}
+
+.showGlossCheckbox {
+    text-align: center;
+}
+
+#MatchingGame {
+	width: 100%;
+	height:	100%;
+}
+
+#MatchingGame #MemoryInfo {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#MatchingGame #MemoryInfo span {
+    padding: 5px;
+}
+
+#MatchingGrid {
+    position: relative;
+	margin-left: auto;
+	margin-right: auto;
+	height:	90%;
+}
+
+#MatchingLeft {
+    position: relative;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    display: inline-block;
+    z-index: 2;
+}
+
+#MatchingRight {
+    position: absolute;
+    top: 0px;
+    left: 80%;
+    width: 25%;
+    height: 100%;
+    z-index: 2;
+}
+
+.matchingLeftItem {
+    position: relative;
+}
+
+.matchingLeftItem img {
+    width: 125px;
+    height: 125px;
+    border: 1px solid black;
+}
+
+.matchingLeftItem:hover img {
+    border-width: 2px;
+    width: 123px;
+    height: 123px;
+}
+
+.matchingLeftItem .wordLabel {
+    position: absolute;
+    left: 0px;
+    bottom: 6px;
+    min-height: 24px;
+    line-height: 24px;
+    width: 100%;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+}
+
+.matchingRightItem {
+    width: 100%;
+    height: 125px;
+    padding: 5px;
+    font-size:32px;
+}
+
+.matchingRightItem:hover {
+    font-weight: bold;
+}
+
+#MatchingLines {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+.matchingLine {
+    position: absolute;
+    -webkit-transform-origin: 0 50%;
+                 
+    height: 5px; /* Line width of 3 */
+    background: gray;
+    z-index: 3;
+}
+
+.matchingLine.incorrect {
+    background-color: crimson;
+}
+
+#DDGame {
+	width: 100%;
+	height:	100%;
+    text-align: center;
+}
+
+#DDCurrentWord {
+    font-family: "Charis SIL";
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#DDGrid {
+	margin-left: auto;
+	margin-right: auto;
+    min-height: 500px;
+    text-align: left;
+}
+
+#DDGrid .ddTile {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    -webkit-transition: all linear .6s;
+    border: 1px solid black;
+    display: inline-block;
+    margin: 5px;
+}
+
+.ddTile.ng-enter {
+    -webkit-transition: all linear .5s;
+}
+
+.ddTile.ng-enter {
+    opacity: 0;
+}
+
+.ddTile.ng-enter.ng-enter-active {
+    opacity: 1;
+}
+
+#DDGrid .ddTile img {
+    width: 100%;
+    height: 100%;
+}
+
+#DDGrid .ddTile .glossLabel {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    min-height: 24px;
+    line-height: 24px;
+    width: 100%;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;    
+}
+
+.ddTile .answer {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    width: 48px;
+    height: 48px;
+    background-repeat: no-repeat;
+    background-size: 48px 48px;
+}
+
+.ddTile .answer.correct {
+    background-image: url("../icons/onebit/onebit-34.png");
+}
+
+.ddTile .answer.incorrect {
     background-image: url("../icons/onebit/onebit-33.png");
 }
 

@@ -1,7 +1,7 @@
 'use strict';
 
 // Declare app level module which depends on filters, and services
-angular.module('VocabLift', ['localization', 'VocabLift.filters', 'VocabLift.services', 'VocabLift.directives', 'ngGrid', 'hashKeyCopier']).
+angular.module('VocabLift', ['ngRoute', 'ngAnimate', 'localization', 'VocabLift.filters', 'VocabLift.services', 'VocabLift.directives', 'ngGrid', 'hashKeyCopier']).
     config(['$routeProvider', function ($routeProvider) {
         $routeProvider.otherwise({
             templateUrl: 'main.html',

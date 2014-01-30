@@ -3,10 +3,8 @@ VocabLiftDirectives.directive('splitPanel', function ($document) {
         compile: function (elem, attrs/*, transcludeFn*/) {
 
             return function (scope, element, attrs) {
-                var orientation = "horizontal";
-                if (attrs.orientation) {
-                    orientation = attrs.orientation;
-                }
+                var orientation = attrs.orientation || "horizontal";
+
                 var sSize;
                 var parentMax;
                 var splitters;
@@ -39,19 +37,14 @@ VocabLiftDirectives.directive('splitPanel', function ($document) {
                                 pBefore.css("right", spLeft + "px");
                                 var t1w = (spLeft - pBefore.position().left) / element.width() * 100;
                                 pBefore.css("width", t1w + "%");
-                                //pBefore.width(spLeft - pBefore.position().left);
                             }
                             if (!pAfter.hasClass("panelCollapsed")) {
                                 pAfter.css("left", spRight);
-                            }
-                            if (!pAfter.hasClass("panelCollapsed")) {
                                 pAfter.css("right", p2r);
                                 var t2w = (p2r - pAfter.position().left) / element.width() * 100;
                                 pAfter.css("width", t2w + "%");
-                                //pAfter.width(p2r - pAfter.position().left);
                             }
-                            //pBefore.resize();
-                            pAfter.resize();
+                            element.resize();
                         }
                         else {
                             sp.addClass("splitterLimit");
@@ -73,14 +66,11 @@ VocabLiftDirectives.directive('splitPanel', function ($document) {
                             }
                             if (!pAfter.hasClass("panelCollapsed")) {
                                 pAfter.css("top", spBottom);
-                            }
-                            if (!pAfter.hasClass("panelCollapsed")) {
                                 pAfter.height(p2b - pAfter.position().top);
                                 var t2w = (p2r - pAfter.position().top) / element.height() * 100;
                                 pAfter.css("height", t2w + "%");
                             }
-                            pBefore.resize();
-                            pAfter.resize();
+                            element.resize();
                         }
                         else {
                             sp.addClass("splitterLimit");
@@ -155,28 +145,24 @@ VocabLiftDirectives.directive('splitPanel', function ($document) {
                 }
 
                 function resizeSplitPanel() {
-
                     if (orientation == "horizontal") {
                         parentMax = element.width();
                         splitters.each(function () {
-                            var tSp = $(this);
-                            tSp.prev().css("right", tSp.prev().position().left + tSp.prev().outerWidth() + "px");
-                            tSp.next().css("right", tSp.next().position().left + tSp.next().outerWidth() + "px");
-                            tSp.css("left", tSp.prev().css("right"));
-                            tSp.next().css("left", tSp.position().left + sSize);
+                            var tSp = $(this);  
+                            tSp.css("left", tSp.prev().position().left + tSp.prev().width());
+                            tSp.next().css("left", tSp.position().left + tSp.width());
+                            tSp.next().css("right", tSp.next().position().left + tSp.next().width() + "px");
                         });
                     }
                     else {
                         parentMax = element.height();
                         splitters.each(function () {
                             var tSp = $(this);
-                            tSp.prev().css("bottom", tSp.prev().position().top + tSp.prev().outerHeight() + "px");
-                            tSp.next().css("bottom", tSp.next().position().top + tSp.next().outerHeight() + "px");
                             tSp.css("top", tSp.prev().position().top + tSp.prev().outerHeight());
-                            tSp.next().css("top", tSp.position().top + sSize);
+                            tSp.next().css("top", tSp.position().top + tSp.width());
+                            tSp.next().css("bottom", tSp.next().position().left + tSp.next().height() + "px");
                         });
                     }
-
                 }
 
                 $(window).resize(function (event) {
@@ -192,7 +178,13 @@ VocabLiftDirectives.directive('splitPanel', function ($document) {
                     splitters.each(function () {
                         var tSp = $(this);
                         tSp.prev().css("right", tSp.prev().position().left + tSp.prev().outerWidth() - sSize + "px");
+                        var t1w = (tSp.prev().width() - sSize) / element.width() * 100;
+                        tSp.prev().css("width", t1w + "%");
+                        
                         tSp.next().css("right", tSp.next().position().left + tSp.next().outerWidth() + "px");
+                        var t2w = (tSp.next().css("right").replace(/[^-\d\.]/g, '') - tSp.next().position().left) / element.width() * 100;
+                        tSp.next().css("width", t2w + "%");
+                        
                         tSp.css("left", tSp.prev().position().left + tSp.prev().outerWidth());
                         /*var m = Math.abs(tSp.next().position().left - (tSp.position().left + sSize));
                          tSp.nextAll().each(function () {
@@ -210,13 +202,19 @@ VocabLiftDirectives.directive('splitPanel', function ($document) {
                     splitters.each(function () {
                         var tSp = $(this);
                         tSp.prev().css("bottom", tSp.prev().position().top + tSp.prev().outerHeight() - sSize + "px");
+                        var t1w = (tSp.prev().height() - sSize) / element.height() * 100;
+                        tSp.prev().css("height", t1w + "%");
+                        
                         tSp.next().css("bottom", tSp.next().position().top + tSp.next().outerHeight() + "px");
+                        var t2w = (tSp.next().css("bottom").replace(/[^-\d\.]/g, '') - tSp.next().position().top) / element.height() * 100;
+                        tSp.next().css("height", t2w + "%");
+                        
                         tSp.css("top", tSp.prev().position().top + tSp.prev().outerHeight());
-                        var m = Math.abs(tSp.next().position().top - (tSp.position().top + sSize));
+                        /*var m = Math.abs(tSp.next().position().top - (tSp.position().top + sSize));
                         tSp.nextAll().each(function () {
                             var tD = $(this);
                             tD.css("top", tD.position().top + m);
-                        });
+                        });*/
                         addCollapsers(tSp);
                     });
                 }

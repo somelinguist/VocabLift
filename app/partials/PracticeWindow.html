@@ -3,11 +3,13 @@
     <button ng-click="closePracticeWindow();">x</button>
 </div>
 <div id="ModeSelector">
-    <span ng-click="switchPracticeMode('Association')" ng-class="{active:practice.mode=='Association'}">{{'_AssociationLabel_' | i18n}}</span>
-    <span ng-click="switchPracticeMode('FlashCard')" ng-class="{active:practice.mode=='FlashCard'}">{{'_FlashCardsLabel_' | i18n}}</span>
-        <span ng-click="switchPracticeMode('Comprehension')"
-              ng-class="{active:practice.mode=='Comprehension'}">{{'_ComprehensionLabel_' | i18n}}</span>
-    <span ng-click="switchPracticeMode('Spelling')" ng-class="{active:practice.mode=='Spelling'}">{{'_SpellingLabel_' | i18n}}</span>
+    <span ng-click="switchPracticeMode('Association')" ng-class="{active:practice.mode=='Association'}">{{'_Association_' | i18n}}</span>
+    <span ng-click="switchPracticeMode('DDGame')" ng-class="{active:practice.mode=='DDGame'}">{{'_DDGame_' | i18n}}</span>
+    <span ng-click="switchPracticeMode('FlashCard')" ng-class="{active:practice.mode=='FlashCard'}">{{'_FlashCards_' | i18n}}</span>
+    <span ng-click="switchPracticeMode('Comprehension')" ng-class="{active:practice.mode=='Comprehension'}">{{'_Comprehension_' | i18n}}</span>
+    <span ng-click="switchPracticeMode('Matching')" ng-class="{active:practice.mode=='Matching'}">{{'_Matching_' | i18n}}</span>
+    <span ng-click="switchPracticeMode('Memory')" ng-class="{active:practice.mode=='Memory'}">{{'_Memory_' | i18n}}</span>
+    <span ng-click="switchPracticeMode('Spelling')" ng-class="{active:practice.mode=='Spelling'}">{{'_Spelling_' | i18n}}</span>
     <!--<span ng-click="practiceMode='Pronunciation'" ng-class="{active:practiceMode=='Pronunciation'}">{{'_PronunciationLabel_' | i18n}}</span>-->
 </div>
 <div id="ModeContent">
@@ -46,7 +48,50 @@
             </div>
             <div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
         </div>
+        <div class="practiceFinished" ng-show="practice.finished">
+		<div class="practiceFinishedContainer">
+			<div>{{'_YouFinished_' | i18n}}</div>
+			<div><button ng-click="practice.finished = false; practice.started = false;">{{'_TryAnotherActivity_' | i18n}}</button></div>
+		</div>
+	</div>
     </div>
+</div>
+<div ng-switch-when="DDGame" ng-controller="DDPractice">
+	<div ng-hide="practice.started">
+        <h3>{{'_NewSessionLabel_' | i18n}}</h3>
+
+        <div ng-show="!practiceCards.length">
+            {{'_PracticeNoNewCards_' | i18n}}
+            <button ng-click="closePracticeWindow()">{{'_OK_' | i18n}}</button>
+        </div>
+        <div ng-show="practiceCards.length">
+            <div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
+            <button ng-click="resetDD(); makeGroup()">{{'_BeginLabel_' | i18n}}</button>
+        </div>
+    </div>
+    <div id="DDGame" ng-show="practice.started">
+        <audio id="DDAudio" hidden="true"
+		   ng-src="{{currentTile.card.properties.audio != '' && project.liftObject.directory + project.config.audioInfo.path + currentTile.card.properties.audio || ''}}"></audio>
+		<div id="DDCurrentWord">{{currentTile.card.properties.side1}}
+            <button ng-click="playAudioWord('DDAudio')">▶</button>
+        </div>
+        <div id="DDGrid">
+            <div class="ddTile" ng-repeat="tile in grid" ng-style="tile.style" ng-click="attempt(tile)">
+                <img ng-src="{{tile.card.properties.picture != '' && project.liftObject.directory + project.config.picturePath + tile.card.properties.picture || ''}}">
+                <div class="glossLabel" ng-show="showGloss">{{tile.card.properties.side2}}</div>
+                <div class="answer"
+				 ng-class="{correct: tile.card.guid == correctTile, incorrect: tile.card.guid != correctTile}"
+				 ng-show="attemptedTile == tile.card.guid"></div>
+            </div>
+		</div>
+        <div class="showGlossCheckbox"><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
+		<div class="practiceFinished" ng-show="practiceFinished && !practiceCopy.length">
+			<div class="practiceFinishedContainer">
+				<div>{{'_YouFinished_' | i18n}}</div>
+				<div><button ng-click="practiceFinished = false; practice.started = false;">{{'_TryAnotherActivity_' | i18n}}</button></div>
+			</div>
+		</div>
+	</div>
 </div>
 <div ng-switch-when="FlashCard" ng-controller="FlashCardPractice">
     <div ng-hide="practice.started">
@@ -98,6 +143,13 @@
             <!--<div><input type="checkbox" ng-model="showGloss"/> Show glosses</div>
             <div><input type="checkbox" ng-model="showPicture"/> Show pictures</div>-->
         </div>
+        <div class="practiceFinished" ng-show="practice.finished">
+		<div class="practiceFinishedContainer">
+			<div>{{'_YouFinished_' | i18n}}</div>
+			<div id="FlashCardProgress" data-i18n="_FlashCardProgress_|{{currentItemIndex+1}}|{{FlashCardTotal}}"></div>
+			<div><button ng-click="practice.finished = false; practice.started = false;">{{'_TryAnotherActivity_' | i18n}}</button></div>
+		</div>
+	</div>
     </div>
 </div>
 <div ng-switch-when="Comprehension" ng-controller="ComprehensionPractice">
@@ -161,8 +213,8 @@
 
                 <div class="label" ng-show="showGloss">{{card.properties.side2}}</div>
                 <div class="answer"
-                     ng-class="{correct:isCorrect(card.guid), incorrect:!isCorrect(card.guid)}"
-                     ng-show="wasAttempted(card.guid) || currentSet.attempts.length == project.config.comprehensionOptions.maxAttempts"></div>
+				 ng-class="{correct:isCorrect(card.guid), incorrect:!isCorrect(card.guid)}"
+				 ng-show="wasAttempted(card.guid) || (currentSet.attempts.length > 1 || currentSet.correct === false) && currentSet.attempts.length == project.config.comprehensionOptions.maxAttempts"></div>
             </div>
         </div>
         <div id="ComprehensionFooter">
@@ -177,6 +229,117 @@
             </div>
             <div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
         </div>
+        <div class="practiceFinished" ng-show="practice.finished">
+		<div class="practiceFinishedContainer">
+			<div>{{'_YouFinished_' | i18n}}</div>
+			<div data-i18n="_ComprehensionProgress_|{{currentSession.completed}}|{{currentSession.sessionData.length}}"></div>
+			<div>{{'_CorrectLabel_' | i18n}}: {{currentSession.correct}} </div>
+			<div>{{'_IncorrectLabel_' | i18n}}: {{currentSession.incorrect}}</div>
+			<div><button ng-click="practice.finished = false; practice.started = false;">{{'_TryAnotherActivity_' | i18n}}</button></div>
+		</div>
+	</div>
+    </div>
+</div>
+<div ng-switch-when="Memory" ng-controller="MemoryPractice">
+    <div ng-hide="practice.started">
+        <h3>{{'_NewSessionLabel_' | i18n}}</h3>
+
+        <div ng-show="!practiceCards.length">
+            {{'_PracticeNoNewCards_' | i18n}}
+            <button ng-click="closePracticeWindow()">{{'_OK_' | i18n}}</button>
+        </div>
+        <div>
+            <span>{{'_NumberOfPairsPerSet_' | i18n}}: </span>
+            <input type=text ng-model="project.config.memoryOptions.maxPairsPerRound"/>
+        </div>
+        <div ng-show="practiceCards.length">
+            <!--<div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>-->
+            <button ng-click="resetMemory(); makeGrid()">{{'_BeginLabel_' | i18n}}</button>
+        </div>
+    </div>
+    <div id="MemoryGame" ng-show="practice.started">
+        <audio id="memoryAudio" hidden="true" ng-src="{{memoryAudioFile}}"></audio>
+		<div id="MemoryMessage">{{message | i18n}} <span ng-show="practiceFinished"><button ng-click="makeGrid();">{{'_Continue_' | i18n}}</button></span></div>
+		<div id="MemoryInfo"><span><strong>{{'_PairsRemaining_' | i18n}}</strong> {{unmatchedPairs}}</span> <span><strong>{{'_TimeElapsed_' | i18n}}</strong> {{timeElapsed | date:'m:ss'}}</span></div>
+		<table id="MemoryGrid">
+			<tr ng-repeat="row in grid">
+				<td ng-repeat="tile in row" ng-click="flipTile(tile)">
+					<div class="container">
+						<div class="card" ng-class="{flipped: tile.flipped, matched: tile.matched}">
+							<div class="front">
+								<img >
+							</div>
+							<div>
+								<div class="wordLabel back" ng-show="{{tile.type == 'word'}}">{{tile.card.properties.side1}}</div>
+								<img class="back" ng-show="{{tile.type == 'picture'}}" ng-src="{{tile.card.properties.picture != '' && project.liftObject.directory + project.config.picturePath + tile.card.properties.picture || ''}}">
+                                <div class="glossLabel back" ng-show="showGloss">{{tile.card.properties.side2}}</div>
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+        <div class="showGlossCheckbox"><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
+		<div class="practiceFinished" ng-show="practiceFinished && !practiceCopy.length">
+			<div class="practiceFinishedContainer">
+				<div>{{'_YouFinished_' | i18n}}</div>
+				<div>{{'_TimeElapsed_' | i18n}} 
+					<ul>
+						<li ng-repeat="round in roundTimes">{{'_MemoryRound_' | i18n}} {{$index + 1}}: {{round | date:'m:ss'}}</li>
+						<li><strong>{{'_TotalTime_' | i18n}}</strong> {{totalTime | date:'m:ss'}}</li>
+					</ul>
+				</div>
+				<div><button ng-click="practiceFinished = false; practice.started = false;">{{'_TryAnotherActivity_' | i18n}}</button></div>
+			</div>
+		</div>
+    </div>
+</div>
+<div ng-switch-when="Matching" ng-controller="MatchingPractice">
+    <div ng-hide="practice.started">
+        <h3>{{'_NewSessionLabel_' | i18n}}</h3>
+
+        <div ng-show="!practiceCards.length">
+            {{'_PracticeNoNewCards_' | i18n}}
+            <button ng-click="closePracticeWindow()">{{'_OK_' | i18n}}</button>
+        </div>
+        <div ng-show="practiceCards.length">
+            <!--<div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>-->
+            <button ng-click="resetMatching(); makeGrid()">{{'_BeginLabel_' | i18n}}</button>
+        </div>
+    </div>
+    <div id="MatchingGame" ng-show="practice.started">
+        <audio id="matchingAudio" hidden="true" ng-src="{{memoryAudioFile}}"></audio>
+		<div id="MemoryMessage">{{message | i18n}} <span ng-show="practiceFinished"><button ng-click="makeGrid();">{{'_Continue_' | i18n}}</button></span></div>
+		<div id="MemoryInfo"><span><strong>{{'_PairsRemaining_' | i18n}}</strong> {{unmatchedPairs}}</span> <span><strong>{{'_TimeElapsed_' | i18n}}</strong> {{timeElapsed | date:'m:ss'}}</span></div>
+		<div id="MatchingGrid">
+            <div id="MatchingLeft" >
+                <div class="matchingLeftItem" ng-repeat="card in matchingLeft" ng-click="startLine(card, $event)">
+                    <img ng-src="{{card.card.properties.picture != '' && project.liftObject.directory + project.config.picturePath + card.card.properties.picture || ''}}"/>
+                    <div class="wordLabel" ng-show="showGloss">{{card.card.properties.side2}}</div>
+                </div>
+            </div>
+            <div id="MatchingRight">
+                <div class="matchingRightItem" ng-repeat="card in matchingRight" ng-click="finishLine(card, $event)">
+                    {{card.card.properties.side1}}
+                </div>
+            </div>
+            <div id="MatchingLines">
+                <div class="matchingLine" ng-repeat="line in lines" ng-style="line.lineStyle" ng-class="{incorrect: line.incorrect}"></div>
+            </div>
+		</div>
+		<div class="showGlossCheckbox"><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
+		<div class="practiceFinished" ng-show="practiceFinished && !practiceCopy.length">
+			<div class="practiceFinishedContainer">
+				<div>{{'_YouFinished_' | i18n}}</div>
+				<div>{{'_TimeElapsed_' | i18n}} 
+					<ul>
+						<li ng-repeat="round in roundTimes">{{'_MemoryRound_' | i18n}} {{$index + 1}}: {{round | date:'m:ss'}}</li>
+						<li><strong>{{'_TotalTime_' | i18n}}</strong> {{totalTime | date:'m:ss'}}</li>
+					</ul>
+				</div>
+				<div><button ng-click="practiceFinished = false; practice.started = false;">{{'_TryAnotherActivity_' | i18n}}</button></div>
+			</div>
+		</div>
     </div>
 </div>
 <div ng-switch-when="Spelling" ng-controller="SpellingPractice">
@@ -228,7 +391,7 @@
 
             <form ng-submit="attempt()">
                 <input ng-model="answer" lang="{{spellingLang}}"/>
-                <input type="submit" value="Check"/>
+                <input type="submit" value="{{'_CheckAnswer_' | i18n}}"/>
                                 <span class="answer"
                                       ng-class="{correct:currentSet.correct, incorrect:!currentSet.correct}"
                                       ng-show="currentSet.attempts.length > 0"></span>
@@ -254,6 +417,15 @@
             </div>
             <div><input type="checkbox" ng-model="showGloss"/> {{'_ShowGlosses_' | i18n}}</div>
         </div>
+        <div class="practiceFinished" ng-show="practice.finished">
+		<div class="practiceFinishedContainer">
+			<div>{{'_YouFinished_' | i18n}}</div>
+			<div data-i18n="_SpellingProgress_|{{currentSession.completed}}|{{currentSession.sessionData.length}}"></div>
+			<div>{{'_CorrectLabel_' | i18n}}: {{currentSession.correct}} </div>
+			<div>{{'_IncorrectLabel_' | i18n}}: {{currentSession.incorrect}}</div>
+			<div><button ng-click="practice.finished = false; practice.started = false;">{{'_TryAnotherActivity_' | i18n}}</button></div>
+		</div>
+	</div>
     </div>
 </div>
 <!--<div ng-switch-when="Pronunciation" ng-controller="PronunciationPractice">

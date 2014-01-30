@@ -64,6 +64,12 @@ LDML.PalasoSortRulesType = new Jsonix.Model.ClassInfo({
 LDML.PalasoDefaultKeyboard = new Jsonix.Model.ClassInfo({
     name: 'LDML.PalasoDefaultKeyboard'
 });
+LDML.PalasoKnownKeyboards = new Jsonix.Model.ClassInfo({
+    name: 'LDML.KnownKeyboards'
+});
+LDML.PalasoKeyboard = new Jsonix.Model.ClassInfo({
+    name: 'LDML.PalasoKeyboard'
+});
 LDML.PalasoSpellCheckingId = new Jsonix.Model.ClassInfo({
     name: 'LDML.PalasoSpellCheckingId'
 });
@@ -236,6 +242,10 @@ LDML.FWDefaultFontFeatures = new Jsonix.Model.ClassInfo({
             elementName: new Jsonix.XML.QName('urn://palaso.org/ldmlExtensions/v1', 'version'),
             typeInfo: LDML.PalasoVersion
         }), new Jsonix.Model.ElementPropertyInfo({
+            name: 'palasoVersion',
+            elementName: new Jsonix.XML.QName('urn://palaso.org/ldmlExtensions/v2', 'version'),
+            typeInfo: LDML.PalasoVersion
+        }), new Jsonix.Model.ElementPropertyInfo({
             name: 'palasoSortRulesType',
             elementName: new Jsonix.XML.QName('urn://palaso.org/ldmlExtensions/v1', 'sortRulesType'),
             typeInfo: LDML.PalasoSortRulesType
@@ -243,6 +253,10 @@ LDML.FWDefaultFontFeatures = new Jsonix.Model.ClassInfo({
             name: 'palasoDefaultKeyboard',
             elementName: new Jsonix.XML.QName('urn://palaso.org/ldmlExtensions/v1', 'defaultKeyboard'),
             typeInfo: LDML.PalasoDefautlKeyboard
+        }), new Jsonix.Model.ElementPropertyInfo({
+            name: 'palasoKnownKeyboards',
+            elementName: new Jsonix.XML.QName('urn://palaso.org/ldmlExtensions/v2', 'knownKeyboards'),
+            typeInfo: LDML.PalasoKnownKeyboards
         }), new Jsonix.Model.ElementPropertyInfo({
             name: 'palasoSpellCheckingId',
             elementName: new Jsonix.XML.QName('urn://palaso.org/ldmlExtensions/v1', 'spellCheckingId'),
@@ -325,6 +339,29 @@ LDML.FWDefaultFontFeatures = new Jsonix.Model.ClassInfo({
             name: 'value',
             typeInfo: Jsonix.Schema.XSD.String.INSTANCE,
             attributeName: new Jsonix.XML.QName('value')
+        })];
+    }
+    {
+        LDML.PalasoKnownKeyboards.properties = [new Jsonix.Model.ElementPropertyInfo({
+            name: 'keyboard',
+            collection: true,
+            elementName: new Jsonix.XML.QName('urn://palaso.org/ldmlExtensions/v2', 'keyboard'),
+            typeInfo: LDML.PalasoKeyboard
+        })];
+    }
+    {
+        LDML.PalasoKeyboard.properties = [new Jsonix.Model.AttributePropertyInfo({
+            name: 'layout',
+            typeInfo: Jsonix.Schema.XSD.String.INSTANCE,
+            attributeName: new Jsonix.XML.QName('layout')
+        }), new Jsonix.Model.AttributePropertyInfo({
+            name: 'locale',
+            typeInfo: Jsonix.Schema.XSD.String.INSTANCE,
+            attributeName: new Jsonix.XML.QName('locale')
+        }), new Jsonix.Model.AttributePropertyInfo({
+            name: 'os',
+            typeInfo: Jsonix.Schema.XSD.String.INSTANCE,
+            attributeName: new Jsonix.XML.QName('os')
         })];
     }
     {
@@ -468,6 +505,18 @@ LDML.Mappings.elementInfos = [
     {
         elementName: new Jsonix.XML.QName('urn://palaso.org/ldmlExtensions/v1', 'defaultKeyboard'),
         typeInfo: LDML.PalasoDefaultKeyboard
+    },
+    {
+        elementName: new Jsonix.XML.QName('urn://palaso.org/ldmlExtensions/v2', 'knownKeyboards'),
+        typeInfo: LDML.PalasoKnownKeyboards
+    },
+    {
+        elementName: new Jsonix.XML.QName('urn://palaso.org/ldmlExtensions/v2', 'keyboard'),
+        typeInfo: LDML.PalasoKeyboard
+    },
+    {
+        elementName: new Jsonix.XML.QName('urn://palaso.org/ldmlExtensions/v2', 'version'),
+        typeInfo: LDML.PalasoVersion
     },
     {
         elementName: new Jsonix.XML.QName('urn://fieldworks.sil.org/ldmlExtensions/v1', 'graphiteEnabled'),

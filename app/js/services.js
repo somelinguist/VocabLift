@@ -172,24 +172,21 @@ VocabLiftServices.factory('WritingSystemServices', function ($http, $filter) {
                         }
                     }
                  }*/
-                this.localeNameToLCID = function (localeName) {
+                this.localeNameToLCID = function (localeName, getLCID) {
                     var lcid;
                     var localeTools = spawn('LocaleTools.exe', ['LocaleNameToLCID', localeName]);
 
-                    var finished = false;
                     localeTools.stdout.on('data', function (data) {
-                        lcid = data;
-                        finished = true;
+                        var buff = new Buffer(data);
+                        lcid = buff.toString('utf8');
+                        if (getLCID) {
+                            getLCID(lcid);
+                        }
                         //console.log('stdout: ' + data);
                     });
-                    while (!finished) {
-
-                    }
-                    return lcid;
                 };
             }
         };
-
         var service = {
             localeService: new LocaleService(),
             importWritingSystems: function (path) {
@@ -228,7 +225,7 @@ VocabLiftServices.factory('WritingSystemServices', function ($http, $filter) {
                                  if (iWs.identity.variant) {
                                  language = language + "-" + iWs.identity.variant.type;
                                  }*/
-                                var palaso = $filter('filter')(iWs.special, {palasoVersion: "2"})[0];
+                                var palaso = $filter('filter')(iWs.special, {palasoVersion: "2"});
                                 var fw = $filter('filter')(iWs.special, function (f) {
                                     if (f.fwWindowsLCID) {
                                         return true;
@@ -236,19 +233,37 @@ VocabLiftServices.factory('WritingSystemServices', function ($http, $filter) {
                                 });
                                 if ($.isArray(fw) && fw.length) {
                                     keyboard = fw[0].fwWindowsLCID.value;
+                                    var ws = {
+                                        language: language,
+                                        languageName: palaso[0].palasoLanguageName.value,
+                                        fontFamily: palaso[0].palasoDefaultFontFamily.value,
+                                        keyboard: keyboard
+                                    };
+                                    writingSystems.push(ws);
                                 }
-                                else if (palaso.palasoDefaultKeyboard) {
-                                    var pkb = palaso.palasoDefaultKeyboard.value.split("-", 1);
-                                    keyboard = this.localeService.localeNameToLCID(pkb[1]);
+                                else {
+                                    var pkb;
+                                    if (palaso.length > 1) {
+                                        if (palaso[1].palasoKnownKeyboards && palaso[1].palasoKnownKeyboards.keyboard) {
+                                            pkb = palaso[1].palasoKnownKeyboards.keyboard[0].locale;
+                                        }
+                                    }
+                                    else if (palaso[0].palasoDefaultKeyboard) {
+                                        pkb = palaso[0].palasoDefaultKeyboard.value.split("-", 1)[1];
+                                        
+                                    }
+                                    keyboard = this.localeService.localeNameToLCID(pkb, function (keyboard) {
+                                        var ws = {
+                                            language: language,
+                                            languageName: palaso[0].palasoLanguageName.value,
+                                            fontFamily: palaso[0].palasoDefaultFontFamily.value,
+                                            keyboard: keyboard
+                                        };
+                                        writingSystems.push(ws);
+                                    });
                                 }
 
-                                var ws = {
-                                    language: language,
-                                    languageName: palaso.palasoLanguageName.value,
-                                    fontFamily: palaso.palasoDefaultFontFamily.value,
-                                    keyboard: keyboard
-                                };
-                                writingSystems.push(ws);
+                                
                             }
 
                         }
@@ -398,12 +413,59 @@ VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServi
 
                 project.config.appVersion = gui.App.manifest.version;
 
-                project.config.vernacularLang = $(project.liftObject.liftXMLDoc).xpath("distinct-values(//lexical-unit/form/@lang)").toArray();
+                //project.config.vernacularLang = $(project.liftObject.liftXMLDoc).xpath("distinct-values(//lexical-unit/form/@lang)").toArray();
                 var lexicalUnit = $filter('filter')(project.defaultColumns, {fieldName: "lexicalUnit"})[0];
+                
+                
+                project.config.vernacularLang = [];
+                project.config.analysisLang = [];
+                
+                var glosses = false;
+                var defintions = false;
+                
+                angular.forEach(project.liftObject.lift.value.entry, function (entry) {
+                    if (entry.lexicalUnit) {
+                        angular.forEach(entry.lexicalUnit.form, function (lex) {
+                            if (project.config.vernacularLang.indexOf(lex.lang) == -1) {
+                                project.config.vernacularLang.push(lex.lang);
+                            } 
+                        });  
+                    }
+                    if (entry.sense) {
+                        if (entry.sense[0].gloss) {
+                            angular.forEach(entry.sense[0].gloss, function (gloss) {
+                                if (project.config.analysisLang.indexOf(gloss.lang) == -1) {
+                                    project.config.analysisLang.push(gloss.lang);
+                                    glosses = true;
+                                }
+                            });
+                        }
+                        if (entry.sense[0].definition) {
+                            angular.forEach(entry.sense[0].definition.form, function (def) {
+                                if (project.config.analysisLang.indexOf(def.lang) == -1) {
+                                    project.config.analysisLang.push(def.lang);
+                                    defintions = true;
+                                }
+                            });
+                        } 
+                    }
+                });
+                
                 lexicalUnit.writingSystemId = project.config.vernacularLang[0];
                 project.config.listViewTemplate.columns.push(lexicalUnit);
-
-                project.config.analysisLang = $(project.liftObject.liftXMLDoc).xpath("distinct-values(//gloss/@lang)").toArray();
+                
+                if (glosses) {
+                    var gloss = $filter('filter')(project.defaultColumns, {fieldName: "gloss"})[0];
+                    gloss.writingSystemId = project.config.analysisLang[0];
+                    project.config.listViewTemplate.columns.push(gloss);
+                }
+                else if (defintions) {
+                    var definition = $filter('filter')(project.defaultColumns, {fieldName: "definition"})[0];
+                    definition.writingSystemId = project.config.analysisLang[0];
+                    project.config.listViewTemplate.columns.push(definition);
+                }
+                
+                /*project.config.analysisLang = $(project.liftObject.liftXMLDoc).xpath("distinct-values(//gloss/@lang)").toArray();
                 if (project.config.analysisLang.length === 0) {
                     project.config.analysisLang = $(project.liftObject.liftXMLDoc).xpath("distinct-values(//definition/form/@lang)").toArray();
                     if (project.config.analysisLang.length > 0) {
@@ -416,7 +478,7 @@ VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServi
                     var gloss = $filter('filter')(project.defaultColumns, {fieldName: "gloss"})[0];
                     gloss.writingSystemId = project.config.analysisLang[0];
                     project.config.listViewTemplate.columns.push(gloss);
-                }
+                }*/
             }
 
             var semver = require('semver');
@@ -427,6 +489,11 @@ VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServi
             }
             if (!project.config.comprehensionOptions.maxAttempts) {
                 project.config.comprehensionOptions.maxAttempts = 3;
+            }
+            if (!project.config.memoryOptions) {
+                project.config.memoryOptions = {
+                    maxPairsPerRound: 8
+                };
             }
             if (!project.config.spellingOptions) {
                 project.config.spellingOptions = {maxAttempts: 3, checkDiacritics: true};
@@ -442,8 +509,8 @@ VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServi
                 }
             }
             if (!project.config.interfaceLang) {
-                if (["en-US", "es"].indexOf(navigator.language) != -1) {
-                    project.config.interfaceLang = navigator.language;
+                if (["es"].indexOf(navigator.language) == 0) {
+                    project.config.interfaceLang = "es";
                 }
                 else {
                     project.config.interfaceLang = "en-US";
@@ -571,21 +638,28 @@ VocabLiftServices.factory('PracticeServices', function ($http, $filter, $rootSco
 
                  var data = inp.pipe(unzip);//.read();
                  sessions = JSON.parse(data);*/
-
-                SessionsDoc = fs.readFileSync(path, {encoding: "utf8"}, function (err, errData) {
-                });
-                var buffer = new Buffer(SessionsDoc, 'base64');
-                zlib.unzip(buffer, function (err, buffer) {
-                    if (!err) {
-                        var data = buffer.toString();
-                        if (data) {
-                            sessions = JSON.parse(data);
+                
+                if (!fs.existsSync(path)) {
+                    sessions = [];
+                    this.saveSessionsToFile(path);
+                }
+                else {
+                    SessionsDoc = fs.readFileSync(path, {encoding: "utf8"}, function (err, errData) {
+                    });
+                    var buffer = new Buffer(SessionsDoc, 'base64');
+                    zlib.unzip(buffer, function (err, buffer) {
+                        if (!err) {
+                            var data = buffer.toString();
+                            if (data) {
+                                sessions = JSON.parse(data);
+                            }
+                            $rootScope.$broadcast("sessionsUpdated");
+                            // TODO: change references in controllers to use .getAllSessions() to save RAM
+                            //global.allSessions = sessions;
                         }
-                        $rootScope.$broadcast("sessionsUpdated");
-                        // TODO: change references in controllers to use .getAllSessions() to save RAM
-                        //global.allSessions = sessions;
-                    }
-                });
+                    });
+                }
+                
             }
             catch (e) {
                 alert(e);

@@ -19,19 +19,26 @@ VocabLiftDirectives.directive('draggable', function () {
                 if (ngModel.$modelValue.entity) {
                     data.type = "entry";
                     data.value = ngModel.$modelValue.entity;
+                    $(".deck").addClass("dropZone");
                 }
                 else if (ngModel.$modelValue.properties) {
                     data.type = "card";
                     data.value = ngModel.$modelValue;
+                    $(".deck").addClass("dropZone");
+                }
+                else if (ngModel.$modelValue.subdecks) {
+                    data.type = "deck";
+                    data.value = ngModel.$modelValue;
+                    $(".deck").bind("dragenter", function () { $(this).addClass("dropBeforeZone"); return false; }).bind("dragleave", function () { $(this).removeClass("dropBeforeZone"); return false; });
                 }
                 data = angular.toJson(data);
-                $(".deck").addClass("dropZone");
                 event.originalEvent.dataTransfer.setData("text/json", data);
                 return true;
             });
             element.bind("dragend", function () {
                 $(".deck").removeClass("dropZone");
-            })
+                $(".deck").removeClass("dropBeforeZone");
+            });
         }
     };
 });

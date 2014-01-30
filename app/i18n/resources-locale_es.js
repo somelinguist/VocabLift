@@ -310,6 +310,11 @@
         "description": "Text for Remove labels"
     },
     {
+        "key": "_MemoryLabel_",
+        "value": "Juego de memoria",
+        "description": "Text for Memory label"
+    },
+	{
         "key": "_SpellingSetup_",
         "value": "Configuración de Deletrear",
         "description": "Text for Remove labels"
@@ -330,32 +335,37 @@
         "description": "Text for Cancel buttons"
     },
     {
-        "key": "_AssociationLabel_",
+        "key": "_Association_",
         "value": "Asociación",
         "description": "Text for Association labels"
     },
     {
-        "key": "_FlashCardsLabel_",
+        "key": "_FlashCards_",
         "value": "Tarjeta de Memorización",
         "description": "Text for Flash Cards labels"
     },
     {
-        "key": "_ComprehensionLabel_",
+        "key": "_Comprehension_",
         "value": "Comprensión",
         "description": "Text for Comprehension"
     },
     {
-        "key": "_SpellingLabel_",
+        "key": "_Memory_",
+        "value": "Juego de memoria",
+        "description": "Text for Memory"
+    },
+    {
+        "key": "_Spelling_",
         "value": "Deletrear",
         "description": "Text for Spelling label"
     },
     {
-        "key": "_PronunciationLabel_",
+        "key": "_Pronunciation_",
         "value": "Pronunciación",
         "description": "Text for Pronunciation labels"
     },
     {
-        "key": "_MemoryGameLabel_",
+        "key": "_MemoryGame_",
         "value": "Juego de Memoria",
         "description": "Text for Memory Game labels"
     },
@@ -518,5 +528,165 @@
         "key": "_DeleteAlert_",
         "value": "Quiere borrar esta baraja?",
         "description": "Text for delete deck warning."
+    },
+    {
+        "key": "_StudyWhat_",
+        "value": "¿Qué quieres estudiar?",
+        "description": "Text for Deck selector."
+    },
+    {
+        "key": "_YouAreStudying_",
+        "value": "Estás estudiando",
+        "description": "Text for Active Deck in Mode selector."
+    },
+    {
+        "key": "_HowStudy_",
+        "value": "¿Cómo quieres estudiar?",
+        "description": "Text for Mode Selector."
+    },
+    {
+        "key": "_PairsRemaining_",
+        "value": "Pares restantes:",
+        "description": "Text for Pairs Remaining."
+    },
+    {
+        "key": "_TimeElapsed_",
+        "value": "Tiempo transcurrido:",
+        "description": "Text for Time Elapsed."
+    },
+    {
+        "key": "_YouFinished_",
+        "value": "Terminaste!",
+        "description": "Text for You Finished."
+    },
+    {
+        "key": "_TryAnotherActivity_",
+        "value": "Haz otra actividad",
+        "description": "Text for Try Another Activity."
+    },
+    {
+        "key": "_QuityActivity_",
+        "value": "Dejar la actividad",
+        "description": "Text for Quit Activity."
+    },
+    {
+        "key": "_ClickOnACard_",
+        "value": "Haz clic en una tarjeta",
+        "description": "Text for Click on a card."
+    },
+    {
+        "key": "_ChooseAnotherCard_",
+        "value": "Elije otra tarjeta",
+        "description": "Text for Choose another card."
+    },
+    {
+        "key": "_TryAgain_",
+        "value": "Inténtalo de nuevo",
+        "description": "Text for Try again."
+    },
+    {
+        "key": "_GoodJob_",
+        "value": "¡Bien hecho!",
+        "description": "Text for Good job."
+    },
+    {
+        "key": "_YouWon_",
+        "value": "¡Ganaste!",
+        "description": "Text for You won."
+    },
+    {
+        "key": "_MemoryRound_",
+        "value": "Ronda",
+        "description": "Text for Memory Round."
+    },
+    {
+        "key": "_TotalTime_",
+        "value": "En total:",
+        "description": "Text for Memory Total time."
+    },
+    {
+        "key": "_CheckAnswer_",
+        "value": "Verificar",
+        "description": "Text for Check answer button."
+    },
+    {
+        "key": "_Continue_",
+        "value": "Seguir",
+        "description": "Text for Continue button."
+    },
+    {
+        "key": "_Language_",
+        "value": "Idioma",
+        "description": "Text for Languages labels"
+    },
+    {
+        "key": "_DeckProperties_",
+        "value": "Propiedades de baraja",
+        "description": "Text for Deck Properties label"
+    },
+    {
+        "key": "_NameLabel_",
+        "value": "Nombre",
+        "description": "Text for Name labels"
+    },
+    {
+        "key": "_PracticeModesForLite_",
+        "value": "Juegos disponibles para VocabLift Lite",
+        "description": "Text for VocabLift Lite label"
+    },
+    {
+        "key": "_UpdateDeck_",
+        "value": "Guardar",
+        "description": "Text for Update deck label"
+    },
+    {
+        "key": "_Edit_",
+        "value": "Editar",
+        "description": "Text for Edit labels"
+    },
+    {
+        "key": "_DeckImportExportMenuText_",
+        "value": "Barajas",
+        "description": "Text for Deck import/export menu label"
+    },
+    {
+        "key": "_CardFilterAllText_",
+        "value": "Buscar tarjeta...",
+        "description": "Text for card filter all fields placeholder"
+    },
+    {
+        "key": "_Matching_",
+        "value": "Busca pares",
+        "description": "Text for Matching game."
+    },
+    {
+        "key": "_MatchCards_",
+        "value": "Busca pares de fotos y palabras.",
+        "description": "Text for Click on a card."
+    },
+    {
+        "key": "_MemorySetup_",
+        "value": "Configuración del Juego de Memoria",
+        "description": "Text for Max memory pairs per round."
+    },
+    {
+        "key": "_NumberOfPairsPerSet_",
+        "value": "La cantidad máxima de pares por ronda.",
+        "description": "Text for Max memory pairs per round."
+    },
+    {
+        "key": "_DDGame_",
+        "value": "Dirty Dozen",
+        "description": "Text for DDGame."
+    },
+    {
+        "key": "_NewDeck_",
+        "value": "Nueva Baraja",
+        "description": "Text for New Deck."
+    },
+    {
+        "key": "_ShowWords_",
+        "value": "Mostrar Palabras",
+        "description": "Text for Show Words."
     }
 ]

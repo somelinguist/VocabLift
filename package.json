@@ -1,6 +1,6 @@
 {
   "name": "VocabLift",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "main": "app/index.html",
   "window": {
     "show": true,
@@ -13,6 +13,7 @@
     "min_width": 220,
     "min_height": 220
   },
+  "chromium-args": "--enable-threaded-compositing",
   "dependencies": {
     "fs-extra": "~0.8.0",
     "semver": "~2.1.0"

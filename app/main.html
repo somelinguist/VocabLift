@@ -31,6 +31,15 @@
         <div class="panelContainer">
             <div id="CardView">
                 <div class="cardViewEdit">
+                    <div class="cardPicture" ng-click="BrowsePicture();">
+                        <img ng-src="{{pictureEdit != '' && project.liftObject.directory + project.config.picturePath + pictureEdit || ''}}"
+                             ng-show="pictureEdit"/>
+
+                        <div class="cardPictureOverlay" ng-hide="pictureEdit">
+                            <div>{{'_ChoosePicture_' | i18n}}</div>
+                        </div>
+                        <span id="PictureRemoverPicture" ng-click="removePicture($event)"></span>
+                    </div>
                     <div class="cardHeader">
                         <div class="cardHeadword" lang="{{project.config.vernacularLang[0]}}">
                             {{currentCard.properties.side1}}
@@ -38,15 +47,6 @@
                         <div class="cardTools">
                             <button ng-click="saveCard()" ng-disabled="!cardChanged">{{'_SaveCard_' | i18n}}
                             </button>
-                        </div>
-                        <div class="cardPicture" ng-click="BrowsePicture();">
-                            <img ng-src="{{pictureEdit != '' && project.liftObject.directory + project.config.picturePath + pictureEdit || ''}}"
-                                 ng-show="pictureEdit"/>
-
-                            <div class="cardPictureOverlay" ng-hide="pictureEdit">
-                                <div>{{'_ChoosePicture_' | i18n}}</div>
-                            </div>
-                            <span id="PictureRemoverPicture" ng-click="removePicture($event)"></span>
                         </div>
                     </div>
                     <div class="cardFields">
@@ -71,9 +71,8 @@
                                         ng-options="pic.path as pic.display for pic in pictureList">
                                 </select>
                                 <button ng-click="BrowsePicture();">...</button>
-
+                                <span id="PictureRemoverForm" ng-click="removePicture($event)"></span>
                             </div>
-                            <span id="PictureRemoverForm" ng-click="removePicture($event)"></span>
                         </div>
                         <div class="cardField">
                             <div class="label">{{'_Audio_' | i18n}}:</div>
@@ -82,9 +81,9 @@
                                         ng-options="audio.path as audio.display for audio in audioList">
                                 </select>
                                 <button ng-click="BrowseAudio();">...</button>
+                                <button ng-click="playAudioWord('currentCardAudio')" ng-disabled="!audioEdit">▶</button>
+                                <span id="AudioRemoverForm" ng-click="removeAudio()"></span>
                             </div>
-                            <button ng-click="playAudioWord('currentCardAudio')" ng-disabled="!audioEdit">▶</button>
-                            <span id="AudioRemoverForm" ng-click="removeAudio()"></span>
                             <audio id="currentCardAudio" hidden="true"
                                    ng-src="{{audioEdit != '' && project.liftObject.directory + project.config.audioInfo.path + audioEdit || ''}}"></audio>
                         </div>
@@ -148,11 +147,11 @@
                             </div>
                             <div class="dropdown-detail cardEdit">
                                 <div>{{'_PredefinedCardOptionsDescription_' | i18n}}</div>
-                                    <span class="cardSense">
-                                        <select ng-model="currentCard.properties" ng-change="changeCard()"
-                                                ng-options="obj.side2 group by obj.type | i18n for obj in possibilities">
-                                        </select>
-                                    </span>
+                                <span class="cardSense">
+                                    <select ng-model="currentCard.properties" ng-change="changeCard()"
+                                            ng-options="obj.side2 group by obj.type | i18n for obj in possibilities">
+                                    </select>
+                                </span>
                             </div>
                         </div>
                         <div class="showCardStatistics" ng-click="showCardStatisticsWindow()" ng-show="currentCard">
@@ -170,14 +169,35 @@
                         {{'_AddEntries_' | i18n}}
                     </button>
                     <button ng-click="Practice()">{{'_PracticeLabel_' | i18n}}</button>
-                    <button ng-click="exportDecks()" ng-disabled="selectedDecks.length < 1">{{'_ExportDecks_' |
-                        i18n}}
-                    </button>
-                    <button ng-click="importDecks()">{{'_ImportDecks_' | i18n}}</button>
+                    <div id="DeckImportExport">
+                        <button>{{'_DeckImportExportMenuText_' | i18n}}</button>
+                        <ul id=DeckImportExportMenu>
+                            <li ng-click="exportDecks()" ng-disabled="selectedDecks.length < 1">{{'_ExportDecks_' | i18n}}</li>
+                            <li ng-click="importDecks()">{{'_ImportDecks_' | i18n}}</li>
+                        </ul>
+                    </div>
+                    <div id="CardSearchBox">
+                        <div id="CardSearchAllBox">
+                            <input ng-model="project.config.cardListFilter.findAll" placeholder="{{'_CardFilterAllText_' | i18n}}" lang="{{project.config.vernacularLang[0]}}"/>
+                            <div id="CardSearchClear" ng-show="project.config.cardListFilter.findAll || project.config.cardListFilter.side1 || project.config.cardListFilter.side2" ng-click="clearCardListFilter()"></div>
+                            <div id="CardSearchAdvanced">
+                                <div id="CardSearchAdvancedToggle"></div>
+                                <div id="CardSearchAdvancedBox">
+                                    <ul>
+                                        <li>
+                                            <input ng-model="project.config.cardListFilter.side1" placeholder="{{'_Side1_' | i18n}}" lang="{{project.config.vernacularLang[0]}}"/>
+                                        </li>
+                                        <li>
+                                            <input ng-model="project.config.cardListFilter.side2" placeholder="{{'_Side2_' | i18n}}" lang="{{project.config.analysisLang[0]}}"/>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div id="DeckList">
-                    <div id="DeckListContainer" ng-repeat="deck in project.decks" ng-include
-                         src="'partials/deck.html'">{{deck.name}}
+                    <div class="deck" ng-repeat="deck in project.decks" droppable="true" ng-model="deck" dropAction="dropToDeck" ng-include src="'partials/deck.html'">{{deck.name}}
                     </div>
                 </div>
             </div>
@@ -202,6 +222,22 @@
             {{'_SaveButtonLabel_' | i18n}}
         </button>
         <button ng-click="closeSaveCardAlert()">{{'_Cancel_' | i18n}}</button>
+    </div>
+</div>
+<div id="DeckPropertiesEditor" class="hide" ng-class="{hide:!modal.showDeckEditor}">
+    <div id="DeckPropertiesContainer">
+        <h3>{{'_DeckProperties_' | i18n}}</h3>
+        <span class="label">{{'_NameLabel_' | i18n}}: </span><input ng-model="editorDeck.name"/>
+        <div id="DeckEdtiorModes">
+            <h4>{{'_PracticeModesForLite_' | i18n}}:</h4>
+            <ul class="editDeckModes">
+                <li ng-repeat="mode in editorDeck.modes">
+                    <input ng-model="mode.available" type="checkbox"/><span class="label">{{mode.name | i18n}}</span>
+                </li>
+            </ul>
+        </div>
+        <button ng-click="updateEditedDeck()" ng-disabled="!editorDeck.name">{{'_UpdateDeck_' | i18n}}</button>
+        <button ng-click="closeDeckEditor()">{{'_Cancel_' | i18n}}</button>
     </div>
 </div>
 <div id="DeleteDeckAlert" class="hide" ng-class="{hide:!modal.showDeleteDeckAlert}">
