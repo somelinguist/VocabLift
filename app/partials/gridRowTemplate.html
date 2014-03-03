@@ -6,42 +6,88 @@
     <div class="dropdown-detail">
         <div class="detailEntry">
             <table>
-                <td class="label">Word</td>
-                <td>
-                    <div class="detailData">
-                        <div class="detailWord" ng-repeat="form in row.entity.lexicalUnit.form">
-                            <span class="lang">{{form.lang}}</span><span
-                                lang="{{form.lang}}">{{form.text.content[0]}}</span>
-                            <!--<input class="detailInput" ng-model="form.text.content[0]"/>-->
-                        </div>
-                    </div>
-                </td>
-            </table>
-        </div>
-        <div class="detailSense" ng-repeat="sense in row.entity.sense">
-            <div class="senseLabel">Sense {{$index + 1}}</div>
-            <table>
                 <tr>
-                    <td class="label">Glosses</td>
+                    <td class="label">{{'_Word_' | i18n}}</td>
                     <td>
                         <div class="detailData">
-                            <div class="detailGloss" ng-repeat="gloss in sense.gloss">
-                                <span class="lang">{{gloss.lang}}</span><span lang="{{gloss.lang}}">{{gloss.text.content[0]}}</span>
-                                <!--<input class="detailInput" ng-model="gloss.text.content[0]"/>-->
+                            <div class="detailWord" ng-repeat="form in row.entity.lexicalUnit.form">
+                                <span class="lang">{{form.lang}}</span><span
+                                    lang="{{form.lang}}">{{getMultiText(form.text.content)}}</span>
                             </div>
                         </div>
                     </td>
                 </tr>
-                <tr>
-                    <td class="label">Semantic Domain</td>
+                <tr ng-repeat="field in row.entity.field">
+                    <td class="label">{{field.type}}</td>
+                    <td>
+                        <div class="detailData">
+                            <div class="detailWord" ng-repeat="form in field.form">
+                                <span class="lang">{{form.lang}}</span><span
+                                    lang="{{form.lang}}">{{getMultiText(form.text.content)}}</span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-repeat="trait in row.entity.trait">
+                    <td class="label">{{trait.name}}</td>
                     <td>
                         <div class="detailData">
                             <div class="detailSemDomain">
-                                {{sense.trait[0].value}}
-                                <!--<select ui-select2 ng-model="sense.trait[0].value" data-placeholder="Add domain...">
-                                    <option></option>
-                                    <option ng-repeat="domain in semanticDomains.rangeElement" value="{{domain.id}}">{{domain.id}}</option>
-                                </select>-->
+                                {{trait.value}}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="detailSense" ng-repeat="sense in row.entity.sense">
+            <div class="senseLabel">{{'_Sense_' | i18n}} {{$index + 1}}</div>
+            <table>
+                <tr ng-if="sense.grammaticalInfo">
+                    <td class="label">{{'_PartOfSpeech_' | i18n}}</td>
+                    <td>
+                        <div class="detailData">{{sense.grammaticalInfo.value}}</div>
+                    </td>
+                </tr>
+                <tr ng-if="sense.gloss">
+                    <td class="label">{{'_Gloss_' | i18n}}</td>
+                    <td>
+                        <div class="detailData">
+                            <div class="detailGloss" ng-repeat="gloss in sense.gloss">
+                                <span class="lang">{{gloss.lang}}</span><span
+                                    lang="{{gloss.lang}}">{{getMultiText(gloss.text.content)}}</span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-if="sense.definition">
+                    <td class="label">{{'_Definition_' | i18n}}</td>
+                    <td>
+                        <div class="detailData">
+                            <div class="detailGloss" ng-repeat="definition in sense.definition.form">
+                                <span class="lang">{{definition.lang}}</span><span
+                                    lang="{{definition.lang}}">{{getMultiText(definition.text.content)}}</span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-repeat="field in sense.field">
+                    <td class="label">{{field.type}}</td>
+                    <td>
+                        <div class="detailData">
+                            <div class="detailWord" ng-repeat="form in field.form">
+                                <span class="lang">{{form.lang}}</span><span
+                                    lang="{{form.lang}}">{{getMultiText(form.text.content)}}</span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-repeat="trait in sense.trait">
+                    <td class="label">{{trait.name}}</td>
+                    <td>
+                        <div class="detailData">
+                            <div class="detailSemDomain">
+                                {{trait.value}}
                             </div>
                         </div>
                     </td>

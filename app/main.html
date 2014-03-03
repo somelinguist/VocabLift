@@ -1,4 +1,4 @@
-<div id="MainContainer">
+<div id="MainContainer" >
 <input style="display:none;" id="projectFileDialog" type="file" accept=".lift"/>
 <input style="display:none;" id="deckFileOpenDialog" type="file" accept=".deck"/>
 <input style="display:none;" id="deckFileSaveDialog" type="file" nwsaveas accept=".deck"/>
@@ -54,20 +54,20 @@
                             <div class="label">{{'_Side1_' | i18n}}:</div>
                             <div class="cardData">
                                 <input lang="{{project.config.vernacularLang[0]}}" ng-model="side1Edit"
-                                       ng-change="cardChanged = true;"/>
+                                       ng-change="cardChanged = true;" ng-blur="saveCard();"/>
                             </div>
                         </div>
                         <div class="cardField">
                             <div class="label">{{'_Side2_' | i18n}}:</div>
                             <div class="cardData">
                                 <input lang="{{project.config.analysisLang[0]}}" ng-model="side2Edit"
-                                       ng-change="cardChanged = true;"/>
+                                       ng-change="cardChanged = true;" ng-blur="saveCard();"/>
                             </div>
                         </div>
                         <div class="cardField">
                             <div class="label">{{'_Picture_' | i18n}}:</div>
                             <div class="cardData">
-                                <select ng-model="pictureEdit" ng-change="cardChanged = true;"
+                                <select ng-model="pictureEdit" ng-change="cardChanged = true; saveCard();"
                                         ng-options="pic.path as pic.display for pic in pictureList">
                                 </select>
                                 <button ng-click="BrowsePicture();">...</button>
@@ -77,7 +77,7 @@
                         <div class="cardField">
                             <div class="label">{{'_Audio_' | i18n}}:</div>
                             <div class="cardData">
-                                <select ng-model="audioEdit" ng-change="cardChanged = true;"
+                                <select ng-model="audioEdit" ng-change="cardChanged = true; saveCard();"
                                         ng-options="audio.path as audio.display for audio in audioList">
                                 </select>
                                 <button ng-click="BrowseAudio();">...</button>
@@ -96,43 +96,88 @@
                             <div class="dropdown-detail" ng-model="entry">
                                 <div class="detailEntry">
                                     <table>
-                                        <td class="label">{{'_Word_' | i18n}}</td>
-                                        <td>
-                                            <div class="detailData">
-                                                <div class="detailWord" ng-repeat="form in entry.lexicalUnit.form">
-                                                    <span class="lang">{{form.lang}}</span><span
-                                                        lang="{{form.lang}}">{{form.text.content[0]}}</span>
-                                                    <!--<input class="detailInput" ng-model="form.text.content[0]"/>-->
+                                        <tr>
+                                            <td class="label">{{'_Word_' | i18n}}</td>
+                                            <td>
+                                                <div class="detailData">
+                                                    <div class="detailWord" ng-repeat="form in entry.lexicalUnit.form">
+                                                        <span class="lang">{{form.lang}}</span><span
+                                                            lang="{{form.lang}}">{{getMultiText(form.text.content)}}</span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
+                                            </td>
+                                        </tr>
+                                        <tr ng-repeat="field in entry.field">
+                                            <td class="label">{{field.type}}</td>
+                                            <td>
+                                                <div class="detailData">
+                                                    <div class="detailWord" ng-repeat="form in field.form">
+                                                        <span class="lang">{{form.lang}}</span><span
+                                                            lang="{{form.lang}}">{{getMultiText(form.text.content)}}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr ng-repeat="trait in entry.trait">
+                                            <td class="label">{{trait.name}}</td>
+                                            <td>
+                                                <div class="detailData">
+                                                    <div class="detailSemDomain">
+                                                        {{trait.value}}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     </table>
                                 </div>
                                 <div class="detailSense" ng-repeat="sense in entry.sense">
                                     <div class="senseLabel">{{'_Sense_' | i18n}} {{$index + 1}}</div>
                                     <table>
-                                        <tr>
-                                            <td class="label">{{'_Glosses_' | i18n}}</td>
+                                        <tr ng-if="sense.grammaticalInfo">
+                                            <td class="label">{{'_PartOfSpeech_' | i18n}}</td>
+                                            <td>
+                                                <div class="detailData">{{sense.grammaticalInfo.value}}</div>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="sense.gloss">
+                                            <td class="label">{{'_Gloss_' | i18n}}</td>
                                             <td>
                                                 <div class="detailData">
                                                     <div class="detailGloss" ng-repeat="gloss in sense.gloss">
                                                         <span class="lang">{{gloss.lang}}</span><span
-                                                            lang="{{gloss.lang}}">{{gloss.text.content[0]}}</span>
-                                                        <!--<input class="detailInput" ng-model="gloss.text.content[0]"/>-->
+                                                            lang="{{gloss.lang}}">{{getMultiText(gloss.text.content)}}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td class="label">{{'_SemanticDomain_' | i18n}}</td>
+                                        <tr ng-if="sense.definition">
+                                            <td class="label">{{'_Definition_' | i18n}}</td>
+                                            <td>
+                                                <div class="detailData">
+                                                    <div class="detailGloss" ng-repeat="definition in sense.definition.form">
+                                                        <span class="lang">{{definition.lang}}</span><span
+                                                            lang="{{definition.lang}}">{{getMultiText(definition.text.content)}}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr ng-repeat="field in sense.field">
+                                            <td class="label">{{field.type}}</td>
+                                            <td>
+                                                <div class="detailData">
+                                                    <div class="detailWord" ng-repeat="form in field.form">
+                                                        <span class="lang">{{form.lang}}</span><span
+                                                            lang="{{form.lang}}">{{getMultiText(form.text.content)}}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr ng-repeat="trait in sense.trait">
+                                            <td class="label">{{trait.name}}</td>
                                             <td>
                                                 <div class="detailData">
                                                     <div class="detailSemDomain">
-                                                        {{sense.trait[0].value}}
-                                                        <!--<select ui-select2 ng-model="sense.trait[0].value" data-placeholder="Add domain...">
-                                                            <option></option>
-                                                            <option ng-repeat="domain in semanticDomains.rangeElement" value="{{domain.id}}">{{domain.id}}</option>
-                                                        </select>-->
+                                                        {{trait.value}}
                                                     </div>
                                                 </div>
                                             </td>
@@ -142,14 +187,14 @@
                             </div>
                         </div>
                         <div class="dropdown relatedEntryOptions" ng-show="currentCard.entry">
-                            <div class="dropdown-toggle" data-toggle="dropdown">
+                            <div class="dropdown-toggle relatedEntryOptionsLabel" data-toggle="dropdown">
                                 <span>{{'_PredefinedCardOptions_' | i18n}}</span>
                             </div>
                             <div class="dropdown-detail cardEdit">
                                 <div>{{'_PredefinedCardOptionsDescription_' | i18n}}</div>
                                 <span class="cardSense">
                                     <select ng-model="currentCard.properties" ng-change="changeCard()"
-                                            ng-options="obj.side2 group by obj.type | i18n for obj in possibilities">
+                                            ng-options="obj.fieldName && obj.fieldName + ': ' + obj.side2 || obj.side2 group by obj.type | i18n for obj in possibilities">
                                     </select>
                                 </span>
                             </div>
@@ -204,18 +249,9 @@
         </div>
     </div>
 </div>
-    <div id="ModalBackground" class="hide" ng-class="{hide:!modal.showModal}">
-    </div>
-    <div id="PracticeWindow" class="hide" ng-class="{hide:!modal.showPractice}" ng-include
-         src="'partials/PracticeWindow.html'">
-    </div>
-<div id="CardStatisticsWindow" class="hide" ng-class="{hide:!modal.showCardStatistics}" ng-include
-     src="'partials/cardStatistics.html'">
+<div id="ModalBackground" class="hide" ng-class="{hide:!modal.showModal}">
 </div>
-<div id="NewCardWindow" class="hide" ng-class="{hide:!modal.showNewCardW}" ng-include
-     src="'partials/newCardDialog.html'">
-</div>
-<div id="SaveCardAlert" class="hide" ng-class="{hide:!modal.showSaveCardAlert}">
+<div id="SaveCardAlert" ng-show="modal.showSaveCardAlert">
     <div>{{'_SaveCardAlert_' | i18n}}</div>
     <div>
         <button ng-click="closeAndSaveCard()">
@@ -224,10 +260,14 @@
         <button ng-click="closeSaveCardAlert()">{{'_Cancel_' | i18n}}</button>
     </div>
 </div>
-<div id="DeckPropertiesEditor" class="hide" ng-class="{hide:!modal.showDeckEditor}">
+<div id="DeckPropertiesEditor" ng-show="modal.showDeckEditor">
     <div id="DeckPropertiesContainer">
         <h3>{{'_DeckProperties_' | i18n}}</h3>
         <span class="label">{{'_NameLabel_' | i18n}}: </span><input ng-model="editorDeck.name"/>
+        <div id="DeckCardConverter">
+            <span class="label">{{'_ConvertDeckCardsLabel_' | i18n}}: </span> <input ng-model="editorDeck.convertCards" type="checkbox"/>
+            <select ng-disabled="!editorDeck.convertCards" ng-model="editorDeck.convertDeckCardsToType" ng-options="obj.field && obj.field || obj.type for obj in editorDeck.possibileTypes"></select>
+        </div>
         <div id="DeckEdtiorModes">
             <h4>{{'_PracticeModesForLite_' | i18n}}:</h4>
             <ul class="editDeckModes">
@@ -240,7 +280,7 @@
         <button ng-click="closeDeckEditor()">{{'_Cancel_' | i18n}}</button>
     </div>
 </div>
-<div id="DeleteDeckAlert" class="hide" ng-class="{hide:!modal.showDeleteDeckAlert}">
+<div id="DeleteDeckAlert" ng-show="modal.showDeleteDeckAlert">
     <div>{{'_DeleteAlert_' | i18n}}</div>
     <div>
         <button ng-click="removeDeck()">
@@ -248,5 +288,11 @@
         </button>
         <button ng-click="removeDeckCancel()">{{'_Cancel_' | i18n}}</button>
     </div>
+</div>
+<div id="CardStatisticsWindow" class="hide" ng-class="{hide:!modal.showCardStatistics}" ng-include src="'partials/cardStatistics.html'">
+</div>
+<div id="PracticeWindow" class="hide" ng-class="{hide:!modal.showPractice}" ng-include src="'partials/PracticeWindow.html'">
+</div>
+<div id="NewCardWindow" class="hide" ng-class="{hide:!modal.showNewCardW}" ng-include src="'partials/newCardDialog.html'">
 </div>
 </div>

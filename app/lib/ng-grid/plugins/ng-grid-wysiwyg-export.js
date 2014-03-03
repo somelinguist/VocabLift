@@ -1,4 +1,4 @@
-﻿function ngGridWYSIWYGPlugin(filter) {
+﻿function ngGridWYSIWYGPlugin (filter) {
     var self = this;
     self.grid = null;
     self.scope = null;
@@ -17,7 +17,7 @@
             gridWidth: self.scope.totalRowWidth(),
             data: []
         };
-
+        
         angular.forEach(self.scope.columns, function (col) {
             if (col.visible) {
                 ret.columns.push(col.displayName);

@@ -1,5 +1,5 @@
 /* app css stylesheet */
-html, body, #MainContainer {
+html, body, #MainContainer, #ViewContainer {
     width: 100%;
     height: 100%;
     margin: 0px;
@@ -83,8 +83,11 @@ html, body, #MainContainer {
 }
 
 #LiftDictionary .gridStyle {
-    width: 100%;
-    height: 96%;
+    position: absolute;
+    top: 28px;
+    left: -4px;
+    right: 0;
+    bottom: 1px;
 }
 
 .DictionaryLabel {
@@ -113,6 +116,10 @@ html, body, #MainContainer {
 
 .ngTopPanel, .ngViewport, .ngFooterPanel {
     border: 1px solid rgb(212, 212, 212);
+}
+
+.ngViewport {
+    border-bottom: 0px;   
 }
 
 .dropdown-detail {
@@ -153,6 +160,20 @@ html, body, #MainContainer {
     color: black;
     text-shadow: 0 0 0;
     width: 20%
+}
+
+.detailEntry {
+    margin-left: 5px;
+}
+
+.detailSense {
+    margin-left: 7px;
+    overflow: scroll;
+}
+
+.detailSense table {
+    margin-left: 10px;
+    width: inherit;
 }
 
 td.label {
@@ -517,6 +538,12 @@ td.label {
     display: inline-block;
 }
 
+.cardViewEdit .relatedEntryLink, .cardViewEdit .relatedEntryOptionsLabel, .cardViewEdit .showCardStatistics {
+    color: steelblue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 #Decks {
     margin-top: 5px;
     height: 64%;
@@ -705,12 +732,22 @@ td.label {
     opacity: 1.0;
     position: absolute;
     margin: auto;
+    z-index: 10001;
+    overflow: auto;
+}
+
+#DeckPropertiesEditor {
+    top: 20%;
+    left: 20%;
+    right: 20%;
+    bottom: 20%;
+}
+
+#NewCardWindow {
     top: 25%;
     left: 20%;
     right: 20%;
     bottom: 25%;
-    z-index: 10001;
-    overflow: auto;
 }
 
 #NewCardWindowContainer, #DeckPropertiesContainer {
@@ -810,7 +847,7 @@ td.label {
 }
 
 #PracticeArea {
-    margin-top: 50px;
+    margin-top: 28px;
     margin-bottom: 50px;
     margin-left: auto;
     margin-right: auto;
@@ -908,7 +945,7 @@ td.label {
     text-align: center;
     background-color: white;
     font-size: 48px;
-
+    word-wrap: break-word;
 }
 
 #FlashCardArea .side1 {

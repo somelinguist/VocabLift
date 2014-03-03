@@ -441,7 +441,7 @@
     },
     {
         "key": "_PracticeNoNewCards_",
-        "value": "* Para Iniciar una Sesión Nueva, por favor Cierre la Ventana de Práctica y Seleccione qué Tarjetas para Usar en la Pantalla Principal.",
+        "value": "* No hay tarjetas seleccionadas o un campo necesario está en blanco para cada tarjeta seleccionada. Para Iniciar una Sesión Nueva, por favor cierre la Ventana de Práctica y seleccione qué tarjetas para usar en la pantalla principal.",
         "description": "Text for no new cards for new session warning"
     },
     {
@@ -472,6 +472,11 @@
     {
         "key": "user-defined",
         "value": "Definido por el usuario",
+        "description": "Text for grouping Predefined entries select element."
+    },
+    {
+        "key": "custom-field",
+        "value": "Campo personalizdo",
         "description": "Text for grouping Predefined entries select element."
     },
     {
@@ -687,6 +692,11 @@
     {
         "key": "_ShowWords_",
         "value": "Mostrar Palabras",
+        "description": "Text for Show Words."
+    },
+    {
+        "key": "_ConvertDeckCardsLabel_",
+        "value": "Cambiar todas las tarjetas en la bandeja a tipo",
         "description": "Text for Show Words."
     }
 ]

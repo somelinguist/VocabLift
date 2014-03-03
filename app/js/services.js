@@ -2,8 +2,6 @@
 
 /* Services */
 
-// Demonstrate how to register services
-// In this case it is a simple value service.
 var VocabLiftServices = angular.module('VocabLift.services', []);
 VocabLiftServices.value('version', '0.1');
 
@@ -24,7 +22,6 @@ VocabLiftServices.factory('LiftServices', function ($http, $filter) {
         userFields: []
     };
 
-    // service methods here
     return {
         loadLift: function (path) {
 
@@ -126,7 +123,6 @@ VocabLiftServices.factory('DeckServices', function ($http, $filter) {
     };
 });
 
-//if (navigator.userAgent.toLowerCase().indexOf('vocablift') != -1) {
 VocabLiftServices.factory('WritingSystemServices', function ($http, $filter) {
 
     var LocaleService = function () {
@@ -210,8 +206,6 @@ VocabLiftServices.factory('WritingSystemServices', function ($http, $filter) {
                             catch (e) {
                                 alert(e);
                             }
-
-
                             if (ldmlDoc) {
                                 try {
                                     var iWs = writingSystemContext.createUnmarshaller().unmarshalString(ldmlDoc.responseText).value;
@@ -280,7 +274,7 @@ VocabLiftServices.factory('WritingSystemServices', function ($http, $filter) {
         return service;
 
     });
-//}
+
 
 VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServices, WritingSystemServices, DeckServices) {
     var EntryListRow = function (columns, data) {
@@ -292,11 +286,73 @@ VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServi
             if (columns[i].className === "LexEntry") {
                 switch (columns[i].dataType) {
                     case "MultiText":
-                        var t = $filter('filter')(data[fName].form, {lang: columns[i].writingSystemId});
-                        self[fName] = t[0].text.content[0]
+                        if (data[fName]) {
+                            var t = $filter('filter')(data[fName].form, {lang: columns[i].writingSystemId});
+                            self[fName] = t[0].text.content;
+                            if (fName == "lexicalUnit" && data.citation) {
+                                t = $filter('filter')(data.citation.form, {lang: columns[i].writingSystemId});
+                                if (t.length) {
+                                    self[fName] = t[0].text.content;
+                                }
+                            }
+                        }
+                        else {
+                            var field = $filter('filter')(data.field, {type: fName});
+                            if (field && field.length) {
+                                fName = fName.replace(/\s/g, "_");
+                                var t = $filter('filter')(field[0].form, {lang: columns[i].writingSystemId});
+                                if (t && t.length) {
+                                    self[fName] = t[0].text.content;
+                                } 
+                                else if (field[0].form && field[0].form.length) {
+                                    // bug in Fieldworks
+                                    self[fName] = field[0].form[0].text.content;  
+                                }
+                            }
+                            
+                        }
+                        if (Array.isArray(self[fName])) {
+                            var spans = self[fName];
+                            var newValue = [];
+                            angular.forEach(spans, function (span) {
+                                if (span.name && span.name.key == "span" && span.value && span.value.content && span.value.content.length) {
+                                    newValue.push(span.value.content[0]);
+                                }
+                                else {
+                                    newValue.push(span);
+                                }
+                            });
+                            if (newValue.length) {
+                                self[fName] = newValue.join();
+                            }
+                        }
+                        
                         break;
                     case "Option":
-                        self[fName] = data[fName].value;
+                        if (!columns[i].custom) {
+                            self[fName] = data[fName].value;
+                        }
+                        else if (data.trait) {
+                            var traits = $filter('filter')(data.trait, {name: fName});
+                            if (traits && traits.length) {
+                                fName = fName.replace(/\s/g, "_");
+                                self[fName] = traits[0].value;  
+                            }
+                        }
+                        break;
+                    case "OptionCollection":
+                        if (data.trait) {
+                            var traits = $filter('filter')(data.trait, {name: fName});
+                            if (traits) {
+                                fName = fName.replace(/\s/g, "_");
+                                for (var k = 0; k < traits.length; k++) {
+                                    if (self[fName]) {
+                                        self[fName] = self[fName] + ", ";
+                                    }
+                                    self[fName] = self[fName] + traits[k].value;
+                                }
+                            }
+                        }
                         break;
                     default:
 
@@ -311,21 +367,54 @@ VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServi
 
                     switch (columns[i].dataType) {
                         case "MultiText":
-                            var t = null;
-                            if (fName === "gloss") {
-                                if (data.sense[j].gloss) {
-                                    t = $filter('filter')(data.sense[j].gloss, {lang: columns[i].writingSystemId});
+                            if (data.sense[j][fName]) {
+                                var t = null;
+                                if (fName === "gloss") {
+                                    if (data.sense[j].gloss) {
+                                        t = $filter('filter')(data.sense[j].gloss, {lang: columns[i].writingSystemId});
+                                    }
+    
                                 }
-
-                            }
-                            else {
-                                if (data.sense[j][fName]) {
-                                    t = $filter('filter')(data.sense[j][fName].form, {lang: columns[i].writingSystemId});
+                                else {
+                                    if (data.sense[j][fName]) {
+                                        t = $filter('filter')(data.sense[j][fName].form, {lang: columns[i].writingSystemId});
+                                    }
+                                }
+                                if (t && t[0]) {
+                                    if (j > 0) self[fName] = self[fName] + ", ";
+                                    self[fName] = self[fName] + t[0].text.content;
                                 }
                             }
-                            if (t && t[0]) {
-                                if (j > 0) self[fName] = self[fName] + ", ";
-                                self[fName] = self[fName] + t[0].text.content[0];
+                            else if (data.sense[j].field && data.sense[j].field.length) {
+                                var field = $filter('filter')(data.field, {type: fName});
+                                if (field && field.length) {
+                                    fName = fName.replace(/\s/g, "_");
+                                    var t = $filter('filter')(field[0].form, {lang: columns[i].writingSystemId});
+                                    if (t && t.length) {
+                                        if (j > 0) self[fName] = self[fName] + ", ";
+                                        self[fName] = self[fName] + t[0].text.content;
+                                    } 
+                                    else if (field[0].form && field[0].form.length) {
+                                        // bug in Fieldworks
+                                        if (j > 0) self[fName] = self[fName] + ", ";
+                                        self[fName] = self[fName] + field[0].form[0].text.content;  
+                                    }
+                                }
+                            }
+                            if (Array.isArray(self[fName])) {
+                                var spans = self[fName];
+                                var newValue = [];
+                                angular.forEach(spans, function (span) {
+                                    if (span.name && span.name.key == "span" && span.value && span.value.content && span.value.content.length) {
+                                        newValue.push(span.value.content[0]);
+                                    }
+                                    else {
+                                        newValue.push(span);
+                                    }
+                                });
+                                if (newValue.length) {
+                                    self[fName] = newValue.join();
+                                }
                             }
                             break;
                         case "Option":
@@ -333,16 +422,28 @@ VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServi
                                 if (j > 0) self[fName] = self[fName] + ", ";
                                 self[fName] = self[fName] + data.sense[j][fName].value;
                             }
+                            else if (data.sense[j].trait) {
+                                var traits = $filter('filter')(data.sense[j].trait, {name: fName});
+                                if (traits && traits.length) {
+                                    fName = fName.replace(/\s/g, "_");
+                                    self[fName] = traits[0].value;   
+                                }    
+                            }
                             break;
                         case "OptionCollection":
                             if (data.sense[j].trait) {
-                                var domains = $filter('filter')(data.sense[j].trait, {name: "semantic-domain-ddp4"});
-                                if (domains) {
-                                    for (var k = 0; k < domains.length; k++) {
+                                var traitName = fName;
+                                if (fName == "semanticDomain") {
+                                    traitName = "semantic-domain-ddp4";
+                                }
+                                var traits = $filter('filter')(data.sense[j].trait, {name: traitName});
+                                if (traits) {
+                                    fName = fName.replace(/\s/g, "_");
+                                    for (var k = 0; k < traits.length; k++) {
                                         if (self[fName]) {
                                             self[fName] = self[fName] + ", ";
                                         }
-                                        self[fName] = self[fName] + domains[k].value;
+                                        self[fName] = self[fName] + traits[k].value;
                                     }
                                 }
                             }
@@ -389,7 +490,6 @@ VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServi
             return "";
         },
         setColumns: function (columns) {
-            //liftObject.entryRows = new Array();
             var len = this.liftObject.lift.value.entry.length;
             for (var i = 0; i < len; i++) {
                 this.liftObject.lift.value.entry[i].__columnMap__ = new EntryListRow(columns, this.liftObject.lift.value.entry[i]);
@@ -413,7 +513,6 @@ VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServi
 
                 project.config.appVersion = gui.App.manifest.version;
 
-                //project.config.vernacularLang = $(project.liftObject.liftXMLDoc).xpath("distinct-values(//lexical-unit/form/@lang)").toArray();
                 var lexicalUnit = $filter('filter')(project.defaultColumns, {fieldName: "lexicalUnit"})[0];
                 
                 
@@ -464,21 +563,6 @@ VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServi
                     definition.writingSystemId = project.config.analysisLang[0];
                     project.config.listViewTemplate.columns.push(definition);
                 }
-                
-                /*project.config.analysisLang = $(project.liftObject.liftXMLDoc).xpath("distinct-values(//gloss/@lang)").toArray();
-                if (project.config.analysisLang.length === 0) {
-                    project.config.analysisLang = $(project.liftObject.liftXMLDoc).xpath("distinct-values(//definition/form/@lang)").toArray();
-                    if (project.config.analysisLang.length > 0) {
-                        var definition = $filter('filter')(project.defaultColumns, {fieldName: "definition"})[0];
-                        definition.writingSystemId = project.config.analysisLang[0];
-                        project.config.listViewTemplate.columns.push(definition);
-                    }
-                }
-                else {
-                    var gloss = $filter('filter')(project.defaultColumns, {fieldName: "gloss"})[0];
-                    gloss.writingSystemId = project.config.analysisLang[0];
-                    project.config.listViewTemplate.columns.push(gloss);
-                }*/
             }
 
             var semver = require('semver');
@@ -561,15 +645,109 @@ VocabLiftServices.factory('ProjectServices', function ($http, $filter, LiftServi
             var defaultColumnsFile;
 
             try {
+                
+                
                 defaultColumnsFile = fs.readFileSync('app/defaultColumns.json', {encoding: "utf8"});
-
+                
                 project.defaultColumns = JSON.parse(defaultColumnsFile).columns;
-
+                
                 this.loadConfig();
                 project.setColumns(project.config.listViewTemplate.columns);
+                
+                if (project.liftObject.lift.value.header.fields && project.liftObject.lift.value.header.fields.field) {
+                    var customFields = $filter('filter')(project.liftObject.lift.value.header.fields.field, function (field) {
+                        
+                        switch (field.tag) {
+                            case "cv-pattern":
+                            case "tone":
+                            case "comment":
+                            case "import-residue":
+                            case "literal-meaning":
+                            case "summary-definition":
+                            case "scientific-name":
+                               return false;
+                            default:
+                               return true;
+                       }
+                    });
+                    
+                    project.customFields = [];
+                    
+                    if (customFields && customFields.length) {
+                        angular.forEach(customFields, function (field) {
+                            var specs = $filter('filter')(field.form, { lang: "qaa-x-spec" });
+                            
+                            if (specs && specs.length) {
+                                var details = specs[0].text.content[0];
+                                
+                                var className = details.match(/Class=[^;]*/);
+                                if (className) {
+                                    className = className[0].substring(6);   
+                                }
+                                else {
+                                    className = "";   
+                                }
+                                
+                                var type = details.match(/Type=[^;]*/);
+                                if (type) {
+                                    type = type[0].substring(5);
+                                    switch (type) {
+                                        case "String":
+                                        case "OwningAtom":
+                                            type = "MultiText";
+                                            break;
+                                        case "ReferenceAtom":
+                                            type = "Option";
+                                            break;
+                                        case "ReferenceCollection":
+                                            type = "OptionCollection";
+                                            break;
+                                        default:
+                                            type = "";
+                                    }
+                                }
+                                else {
+                                    type = "";   
+                                }
+                                
+                                var ws = details.match(/WsSelector=[^;]*/);
+                                if (ws) {
+                                    ws = ws[0].substring(11);
+                                    switch (ws) {
+                                        case "kwsAnal":
+                                            ws = project.config.analysisLang[0];
+                                            break;
+                                        case "kwsVern":
+                                            ws = project.config.vernacularLang[0];
+                                            break;
+                                        default:
+                                            ws = "";
+                                    }
+                                }
+                                else {
+                                    ws = "";   
+                                }
+                                
+                                if (className && type && ws) {
+                                    var column = {
+                                        className: className,
+                                        dataType: type,
+                                        displayName: field.tag,
+                                        fieldName: field.tag,
+                                        writingSystemId: ws,
+                                        custom: true
+                                    };
+                                    project.defaultColumns.push(column);
+                                    project.customFields.push(column);
+                                }
+                            }
+                        });
+                    }
+                }
+
+                
             }
             catch (e) {
-                //alert(e);
                 console.log(e);
             }
 
@@ -628,17 +806,7 @@ VocabLiftServices.factory('PracticeServices', function ($http, $filter, $rootSco
         },
         loadSessionsFromFile: function (path) {
             var SessionsDoc;
-            //sessions = [];
             try {
-                /*var unzip = zlib.createUnzip({
-                 level: zlib.Z_DEFAULT_COMPRESSION,
-                 windowBits: zlib.MAX_WBITS
-                 });
-                 var inp = fs.createReadStream(path, {encoding: "utf8"});
-
-                 var data = inp.pipe(unzip);//.read();
-                 sessions = JSON.parse(data);*/
-                
                 if (!fs.existsSync(path)) {
                     sessions = [];
                     this.saveSessionsToFile(path);
@@ -654,8 +822,6 @@ VocabLiftServices.factory('PracticeServices', function ($http, $filter, $rootSco
                                 sessions = JSON.parse(data);
                             }
                             $rootScope.$broadcast("sessionsUpdated");
-                            // TODO: change references in controllers to use .getAllSessions() to save RAM
-                            //global.allSessions = sessions;
                         }
                     });
                 }
@@ -697,7 +863,6 @@ VocabLiftServices.factory('PracticeServices', function ($http, $filter, $rootSco
         addSession: function (session) {
             sessions.push(session);
             $rootScope.$broadcast("sessionsUpdated");
-            //global.allSessions = sessions;
         },
         getAllSessions: function () {
             return angular.copy(sessions);
@@ -717,7 +882,6 @@ VocabLiftServices.factory('PracticeServices', function ($http, $filter, $rootSco
                     break;
                 }
             }
-            //global.allSessions = sessions;
         },
         deleteSession: function (guid) {
             var s = $filter('filter')(sessions, {sessionId: guid});
@@ -728,7 +892,6 @@ VocabLiftServices.factory('PracticeServices', function ($http, $filter, $rootSco
                     $rootScope.$broadcast("sessionsUpdated");
                 }
             }
-            //global.allSessions = sessions;
         },
         deleteAllSessions: function () {
             sessions.length = 0;

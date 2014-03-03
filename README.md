@@ -4,15 +4,19 @@ VocabLift
 Language-learning tool that uses vocabulary from <a href="https://code.google.com/p/lift-standard/">LIFT-format</a> dictionaries produced by programs such as <a href="http://fieldworks.sil.org/">Fieldworks Language Explorer</a> and <a href="http://wesay.palaso.org/">WeSay</a>.
 
 <h3>Download</h3>
-<strong><a href="http://sourceforge.net/projects/vocablift/files/Releases/0.3.1/VocabLift-Setup-0.3.1.exe/download">Version 0.3.1</a>:</strong> Available on SourceForge at <a href="http://sourceforge.net/projects/vocablift/files/Releases/0.3.1/VocabLift-Setup-0.3.1.exe/download">http://sourceforge.net/projects/vocablift/files/Releases/0.3.1/VocabLift-Setup-0.3.1.exe/download</a>
+<strong><a href="http://sourceforge.net/projects/vocablift/files/Releases/0.3.2/VocabLift-Setup-0.3.2.exe/download">Version 0.3.2</a>:</strong> Available on SourceForge at <a href="http://sourceforge.net/projects/vocablift/files/Releases/0.3.2/VocabLift-Setup-0.3.2.exe/download">http://sourceforge.net/projects/vocablift/files/Releases/0.3.2/VocabLift-Setup-0.3.2.exe/download</a>
 
 <h3>Requirements</h3>
 As of version 0.3.1, DirectX is required for the Memory game to function correctly.
 
-<h4>New in version 0.3.1</h4>
-- Added new games (Dirty Dozen, Matching, and Memory).
-- Added a search/filter component for the card list.
-- Several interface and filter bugs were fixed.
+<h4>New in version 0.3.2</h4>
+- Initial support for custom fields defined in Fieldworks Language Explorer.
+- Blank new cards can now be created. Cards that have a blank side 1 will not be used in certain practice games (Flashcard, Spelling).
+- Cards within a deck that are related to dictionary entries can now be mass-updated to use a predefined field from the dictionary if present (available through the deck edit window).
+- Changes to cards are now saved automatically if the project is set to save automatically.
+- Decks can be duplicated by holding the Ctrl key when dragging.
+- The arrow keys can be used to advance or go back in the Flashcard game.
+- Various bug fixes.
 
 <h5><a href="changelog.MD">See the change log</a></h5>
 

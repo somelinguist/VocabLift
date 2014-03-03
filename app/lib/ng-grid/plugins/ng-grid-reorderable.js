@@ -1,14 +1,14 @@
 ﻿/* 
  Reorderablr row plugin
- */
+*/
 
-function ngGridReorderable() {
+function ngGridReorderable () {
     var self = this;
     self.$scope = null;
     self.myGrid = null;
 
     // The init method gets called during the ng-grid directive execution.
-    self.init = function (scope, grid, services) {
+    self.init = function(scope, grid, services) {
         // The directive passes in the grid scope and the grid object which we will want to save for manipulation later.
         self.$scope = scope;
         self.myGrid = grid;
@@ -18,12 +18,12 @@ function ngGridReorderable() {
     };
     self.colToMove = undefined;
     self.groupToMove = undefined;
-    self.assignEvents = function () {
+    self.assignEvents = function() {
         // Here we set the onmousedown event handler to the header container.
         self.myGrid.$viewport.on('mousedown', self.onRowMouseDown).on('dragover', self.dragOver).on('drop', self.onRowDrop);
     };
     // Row functions
-    self.onRowMouseDown = function (event) {
+    self.onRowMouseDown = function(event) {
         // Get the closest row element from where we clicked.
         var targetRow = $(event.target).closest('.ngRow');
         // Get the scope from the row element
@@ -35,7 +35,7 @@ function ngGridReorderable() {
             self.services.DomUtilityService.eventStorage.rowToMove = { targetRow: targetRow, scope: rowScope };
         }
     };
-    self.onRowDrop = function (event) {
+    self.onRowDrop = function(event) {
         // Get the closest row to where we dropped
         var targetRow = $(event.target).closest('.ngRow');
         // Get the scope from the row element.
@@ -62,7 +62,7 @@ function ngGridReorderable() {
         self.myGrid.rowCache.splice(j, 0, prevRow);
         self.$scope.$emit('ngGridEventChangeOrder', self.rowCache);
     };
-    self.dragOver = function (evt) {
+    self.dragOver = function(evt) {
         evt.preventDefault();
     };
 }

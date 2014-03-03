@@ -436,7 +436,7 @@
     },
     {
         "key": "_PracticeNoNewCards_",
-        "value": "* To start a new session, please close the practice window and select which cards to use in the main screen.",
+        "value": "* Either there are no cards selected or a required field of all the selected cards is blank. To start a new session, please close the practice window and select which cards to use in the main screen.",
         "description": "Text for no new cards for new session warning"
     },
     {
@@ -467,6 +467,11 @@
     {
         "key": "user-defined",
         "value": "User-defined",
+        "description": "Text for grouping Predefined entries select element."
+    },
+    {
+        "key": "custom-field",
+        "value": "Custom field",
         "description": "Text for grouping Predefined entries select element."
     },
     {
@@ -677,6 +682,11 @@
     {
         "key": "_ShowWords_",
         "value": "Show Words",
+        "description": "Text for Show Words."
+    },
+    {
+        "key": "_ConvertDeckCardsLabel_",
+        "value": "Convert all cards in deck to type",
         "description": "Text for Show Words."
     }
 ]

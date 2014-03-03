@@ -72,11 +72,12 @@
     <div id="DDGame" ng-show="practice.started">
         <audio id="DDAudio" hidden="true"
 		   ng-src="{{currentTile.card.properties.audio != '' && project.liftObject.directory + project.config.audioInfo.path + currentTile.card.properties.audio || ''}}"></audio>
+		<audio id="DDAudio2" hidden="true"></audio>   
 		<div id="DDCurrentWord">{{currentTile.card.properties.side1}}
             <button ng-click="playAudioWord('DDAudio')">▶</button>
         </div>
         <div id="DDGrid">
-            <div class="ddTile" ng-repeat="tile in grid" ng-style="tile.style" ng-click="attempt(tile)">
+            <div class="ddTile" ng-repeat="tile in grid" ng-style="tile.style" ng-click="attempt(tile)" ng-right-click="playTile(tile)">
                 <img ng-src="{{tile.card.properties.picture != '' && project.liftObject.directory + project.config.picturePath + tile.card.properties.picture || ''}}">
                 <div class="glossLabel" ng-show="showGloss">{{tile.card.properties.side2}}</div>
                 <div class="answer"
@@ -107,19 +108,19 @@
             <button ng-click="setupFlashCard()">{{'_BeginLabel_' | i18n}}</button>
         </div>
     </div>
-    <div ng-show="practice.started">
+    <div ng-show="practice.started" ng-click="FFClick()">
         <audio id="flashCardAudio" hidden="true"
                ng-src="{{currentSet.properties.audio != '' && project.liftObject.directory + project.config.audioInfo.path + currentSet.properties.audio || ''}}"></audio>
 
         <div id="FlashCardArea" ng-switch on="currentSet.currentSide">
             <div class="flashCard side1" ng-switch-when="1" ng-click="currentSet.currentSide = 2;">
                 <div>{{currentSet.properties.side1}}</div>
-                <div class="playButton" ng-show="!showSide2First">
+                <div class="playButton" ng-show="!showSide2First && currentSet.properties.audio != ''">
                     <button ng-click="playAudioWord('flashCardAudio', $event)">▶</button>
                 </div>
             </div>
             <div class="flashCard" ng-switch-when="2" ng-click="nextSet()">{{currentSet.properties.side2}}
-                <div class="playButton" ng-show="showSide2First">
+                <div class="playButton" ng-show="showSide2First && currentSet.properties.audio != ''">
                     <button ng-click="playAudioWord('flashCardAudio', $event)">▶</button>
                 </div>
             </div>
@@ -133,10 +134,10 @@
             <div class="label" ng-show="showGloss">{{currentSet.properties.side2}}</div>
         </div>-->
         <div id="FlashCardFooter">
-            <div id="FlashCardNav">
+            <div id="FlashCardNav" ng-keyup="KeyNavigate($event);">
                 <button ng-click="prevSet()">{{'_PreviousLabel_' | i18n}}</button>
                 <button ng-click="currentSet.currentSide = 1">{{'_ResetLabel_' | i18n}}</button>
-                <button ng-click="nextSet()">{{'_NextLabel_' | i18n}}</button>
+                <button ng-click="nextSet()" id="FCNext">{{'_NextLabel_' | i18n}}</button>
             </div>
             <div id="FlashCardProgress" data-i18n="_FlashCardProgress_|{{currentItemIndex+1}}|{{FlashCardTotal}}">
             </div>
@@ -361,11 +362,11 @@
         <div class="practiceNewSessions">
             <h3>{{'_NewSessionLabel_' | i18n}}</h3>
 
-            <div ng-show="!practiceCards.length">
+            <div ng-show="!practiceCards.length || allBlankCards">
                 {{'_PracticeNoNewCards_' | i18n}}
                 <button ng-click="closePracticeWindow()">{{'_OK_' | i18n}}</button>
             </div>
-            <div ng-show="practiceCards.length">
+            <div ng-show="practiceCards.length && !allBlankCards">
                 <div>
                     <span>{{'_MaximumNumberOfAttempts_' | i18n}}: </span>
                     <input type="text" ng-model="project.config.spellingOptions.maxAttempts"/>
@@ -391,7 +392,8 @@
 
             <form ng-submit="attempt()">
                 <input ng-model="answer" lang="{{spellingLang}}"/>
-                <input type="submit" value="{{'_CheckAnswer_' | i18n}}"/>
+                <input type="submit" value="{{'_CheckAnswer_' | i18n}}" ng-hide="currentSession.sessionCompleted"/>
+                <button ng-click="nextSet()" ng-show="currentSession.sessionCompleted">{{'_YouFinished_' | i18n}}</button>
                                 <span class="answer"
                                       ng-class="{correct:currentSet.correct, incorrect:!currentSet.correct}"
                                       ng-show="currentSet.attempts.length > 0"></span>

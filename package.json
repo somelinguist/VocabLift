@@ -1,6 +1,6 @@
 {
   "name": "VocabLift",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "main": "app/index.html",
   "window": {
     "show": true,

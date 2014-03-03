@@ -88,10 +88,6 @@
                     </button>
                 </div>
             </div>
-            <!--<div>
-                Writing System:
-                <select ng-model="selectedCurrentColumn[0].writingSystemId" ng-options="lang for lang in selectedLangOptions"></select>
-            </div>-->
         </div>
         <div id="TaskSettings">
             <div class="title">{{'_ComprehensionSetup_' | i18n}}</div>
@@ -125,7 +121,7 @@
 <script src="lib/localize/localize.js"></script>
 
 <script>
-    // Declare app level module which depends on filters, and services
+    
     angular.module('VocabLiftConfig', ['localization']);
 
     function ConfigureCtrl($scope, $filter, localize) {
@@ -175,7 +171,6 @@
         };
 
         $scope.resetConfig();
-        //$scope.selectedLangOptions = $scope.liftObject.langs;
 
         $scope.$watch('config.interfaceLang', function () {
             if ($scope.config.interfaceLang && ["en-US", "es"].indexOf($scope.config.interfaceLang)) {

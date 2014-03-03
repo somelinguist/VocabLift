@@ -1,11 +1,20 @@
 <h1>Change log</h1>
 
-<h4>New in version 0.3.1</h4>
+<h4 id="v0.3.2">New in version 0.3.2</h4>
+- Initial support for custom fields defined in Fieldworks Language Explorer.
+- Blank new cards can now be created. Cards that have a blank side 1 will not be used in certain practice games (Flashcard, Spelling).
+- Cards within a deck that are related to dictionary entries can now be mass-updated to use a predefined field from the dictionary if present (available through the deck edit window).
+- Changes to cards are now saved automatically if the project is set to save automatically.
+- Decks can be duplicated by holding the Ctrl key when dragging.
+- The arrow keys can be used to advance or go back in the Flashcard game.
+- Various bug fixes.
+
+<h4 id="v0.3.1">New in version 0.3.1</h4>
 - Added new matching memory card games.
 - Added a search/filter component for the card list.
 - Several interface and filter bugs were fixed.
 
-<h4>New in version 0.3.0</h4>
+<h4 id="v0.3.0">New in version 0.3.0</h4>
 - *If upgrading from a version previous to 0.3.0, is recommended that you delete your project's config file. If you use picture or audio files, you may need to manually change the paths to these files for every card in the .decks file.
 - Added support for translation of the UI. Currently English and Spanish are supported.
 - Added an setup program for Windows.

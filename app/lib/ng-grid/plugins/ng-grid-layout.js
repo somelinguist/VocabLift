@@ -1,8 +1,8 @@
-function ngGridLayoutPlugin() {
+function ngGridLayoutPlugin () {
     var self = this;
     this.grid = null;
     this.scope = null;
-    this.init = function (scope, grid, services) {
+    this.init = function(scope, grid, services) {
         self.domUtilityService = services.DomUtilityService;
         self.grid = grid;
         self.scope = scope;
@@ -10,7 +10,7 @@ function ngGridLayoutPlugin() {
 
     this.updateGridLayout = function () {
         if (!self.scope.$$phase) {
-            self.scope.$apply(function () {
+            self.scope.$apply(function(){
                 self.domUtilityService.RebuildGrid(self.scope, self.grid);
             });
         }

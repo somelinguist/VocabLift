@@ -7,8 +7,9 @@ angular.module('VocabLift', ['ngRoute', 'ngAnimate', 'localization', 'VocabLift.
             templateUrl: 'main.html',
             controller: 'VocabLiftCtrl'
         });
-    }]);
-;
+    }]).config(['$locationProvider', function($locationProvider){
+    $locationProvider.html5Mode(true).hashPrefix('!');
+}]);
 
 /*angular.module('VocabLift', ['VocabLift.filters', 'VocabLift.services', 'VocabLift.directives', 'ui', 'ngGrid']).
  config(['$routeProvider', function($routeProvider) {
